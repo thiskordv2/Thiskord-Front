@@ -49,6 +49,9 @@
     <Page Update="Login.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
+	  <Page Update="Navigateur.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+	  </Page>
   </ItemGroup>
 
   <!--

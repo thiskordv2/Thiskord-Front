@@ -35,7 +35,6 @@ namespace Thiskord_Front.Services
                     }
                     else
                     {
-
                         System.Diagnostics.Debug.WriteLine("Erreur Api: " + response.StatusCode);
                         return null;
                     }
