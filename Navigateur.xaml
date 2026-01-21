@@ -23,11 +23,12 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <DropDownButton Grid.Row="0" Content="Mail" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <DropDownButton Grid.Row="0" Content="Mes serveurs" HorizontalAlignment="Center" Margin="0,10,0,0">
                 <DropDownButton.Flyout>
-                    <MenuFlyout Placement="Bottom">
-                        <MenuFlyoutItem Text="Send"/>
-                        <MenuFlyoutItem Text="Reply"/>
+                    <MenuFlyout x:Name="ServerMenuFlyout" 
+                                Placement="Bottom" 
+                                Opening="ServerMenuFlyout_Opening">
+                        <MenuFlyoutItem Text="Chargement"/>
                     </MenuFlyout>
                 </DropDownButton.Flyout>
             </DropDownButton>

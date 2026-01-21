@@ -1,38 +1,61 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using Thiskord_Front.Models.Project;
+using Thiskord_Front.Services;
 
 namespace Thiskord_Front
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class Navigateur : Page
     {
-        public static Frame NavigateurFrame
-        {get; set; }
+        public static Frame NavigateurFrame { get; set; }
+
+        private readonly ApiService _apiService = new ApiService();
+        private bool _serverMenuInitialized;
 
         public Navigateur()
         {
             InitializeComponent();
-
             NavigateurFrame = InnerFrame;
-
             InnerFrame.Navigate(typeof(ns_choice));
+        }
+
+        private async void ServerMenuFlyout_Opening(object sender, object e)
+        {
+            if (_serverMenuInitialized)
+                return;
+
+            if (!ServerMenuFlyout.Items.Any())
+                ServerMenuFlyout.Items.Add(new MenuFlyoutItem { Text = "Chargement..." });
+
+            List<Project> projects = await _apiService.GetAllProjects();
+
+            ServerMenuFlyout.Items.Clear();
+            if (projects.Count > 0)
+            {
+                foreach (var project in projects)
+                {
+                    ServerMenuFlyout.Items.Add(new MenuFlyoutItem
+                    {
+                        Text = project.name,
+                        Tag = project
+                    });
+                }
+                _serverMenuInitialized = true; // évite les rappels API
+            }
+            else
+            {
+                ServerMenuFlyout.Items.Add(new MenuFlyoutItem { Text = "Aucun projet trouvé", IsEnabled = false });
+            }
+
+            if (ServerMenuFlyout.IsOpen)
+            {
+                var target = ServerMenuFlyout.Target as FrameworkElement;
+                ServerMenuFlyout.Hide();
+                if (target is not null)
+                    ServerMenuFlyout.ShowAt(target);
+            }
         }
     }
 }
