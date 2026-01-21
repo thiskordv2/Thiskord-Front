@@ -10,11 +10,11 @@ namespace Thiskord_Front.Models.Project
 {
     public class Project
     {
-        [JsonPropertyName("project_id")]
+        [JsonPropertyName("id")]
         public int? id { get; set; }
-        [JsonPropertyName("project_name")]
+        [JsonPropertyName("name")]
         public string? name { get; set; }
-        [JsonPropertyName("project_desc")]
+        [JsonPropertyName("description")]
         public string? description { get; set; }
         public Project()
         {
@@ -29,10 +29,10 @@ namespace Thiskord_Front.Models.Project
 
         public class ProjectRequest
         {
-            [JsonPropertyName("project_name")]
+            [JsonPropertyName("name")]
             public string name { get; set; }
 
-            [JsonPropertyName("project_desc")]
+            [JsonPropertyName("description")]
             public string description { get; set; }
         }
     }

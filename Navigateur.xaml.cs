@@ -42,7 +42,7 @@ namespace Thiskord_Front
                         Tag = project
                     });
                 }
-                _serverMenuInitialized = true; // évite les rappels API
+                _serverMenuInitialized = true; 
             }
             else
             {
