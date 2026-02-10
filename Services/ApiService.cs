@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Thiskord_Front.Models.Project;
@@ -11,7 +12,9 @@ namespace Thiskord_Front.Services
     public class ApiService
     {
         private static readonly HttpClient client = new HttpClient();
-        private bool loaded = false;
+        
+        private bool loaded = false; 
+
         public ApiService()
         {
             if (client.BaseAddress == null)
@@ -22,31 +25,40 @@ namespace Thiskord_Front.Services
             }
         }
 
-        private async Task<string> CallApiAsync(string route)
+        public async Task<string> CallApiAsync(string route, string method = "GET", string? jsonRequest = null)
         {
-            if (!loaded)
+            try
             {
-                try
+                HttpResponseMessage? response = null;
+                switch (method.ToUpper())
                 {
-                    HttpResponseMessage response = await client.GetAsync(route);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        return await response.Content.ReadAsStringAsync();
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("Erreur Api: " + response.StatusCode);
-                        return null;
-                    }
+                    case "POST":
+                        var content = new StringContent(
+                            jsonRequest ?? "",
+                            Encoding.UTF8,
+                            "application/json"
+                        );
+                        response = await client.PostAsync(route, content);
+                        break;
+                    case "GET":
+                    default:
+                        response = await client.GetAsync(route);
+                        break;
                 }
-                catch (Exception ex)
+
+                if (response != null && response.IsSuccessStatusCode)
                 {
-                    System.Diagnostics.Debug.WriteLine("Erreur Connection: " + ex.Message);
+                    return await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Erreur Api: " + (response?.StatusCode.ToString() ?? "Pas de réponse"));
                     return null;
                 }
             }
-            else
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine("Erreur Connection: " + ex.Message);
                 return null;
             }
         }
@@ -54,19 +66,27 @@ namespace Thiskord_Front.Services
         public async Task<List<Project>> GetAllProjects()
         {
             loaded = false;
-            string jsonResult = await CallApiAsync("project/all");
+            string jsonResult = await CallApiAsync("project/all", "GET");
+            
             System.Diagnostics.Debug.WriteLine("API payload: " + (jsonResult ?? "null"));
 
             if (!string.IsNullOrEmpty(jsonResult))
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var projects = JsonSerializer.Deserialize<List<Project>>(jsonResult, options) ?? new List<Project>();
-                loaded = true;
-                return projects;
+                try 
+                {
+                    var projects = JsonSerializer.Deserialize<List<Project>>(jsonResult, options) ?? new List<Project>();
+                    loaded = true;
+                    return projects;
+                }
+                catch (JsonException ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Erreur Désérialisation: " + ex.Message);
+                    return new List<Project>();
+                }
             }
             else
             {
-                loaded = false;
                 return new List<Project>();
             }
         }
