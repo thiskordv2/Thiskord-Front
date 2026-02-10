@@ -8,9 +8,25 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
+
+            <Style x:Key="CaseBorderStyle" TargetType="Border">
+                <Setter Property="CornerRadius" Value="10"/>
+
+                <Setter Property="Background" Value="#15FFFFFF"/>
+                <Setter Property="Width" Value="300"/>
+                <Setter Property="Height" Value="150" />
+
+                <Setter Property="Padding" Value="5"/>
+            </Style>
+
+            <Style x:Key="LoginBackgroundStyle" TargetType="StackPanel">
+                <Setter Property="CornerRadius" Value="10"/>
+
+                <Setter Property="Background" Value="#15FFFFFF"/>
+
+                <Setter Property="Padding" Value="15"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

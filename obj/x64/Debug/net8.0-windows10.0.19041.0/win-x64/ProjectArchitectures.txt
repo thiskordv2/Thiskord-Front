@@ -1,1 +1,1 @@
-C:\Users\julie\Documents\Developpement\Projet\Thiskord_Front\Thiskord_Front.csproj;x64
+C:\Licence LID\Cours\Thiskord_repo\Thiskord_front\Thiskord_Front.csproj;x64

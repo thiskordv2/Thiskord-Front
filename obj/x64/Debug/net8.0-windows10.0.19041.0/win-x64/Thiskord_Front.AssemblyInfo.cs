@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Thiskord_Front")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec948218f330abb888482f27363781aeb24d489d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+668374c1ea56bee16452beac9e98d1db4659e031")]
 [assembly: System.Reflection.AssemblyProductAttribute("Thiskord_Front")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Thiskord_Front")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

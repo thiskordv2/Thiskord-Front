@@ -4,31 +4,43 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Thiskord_Front.Models;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using Thiskord_Front.Services;
+using Windows.Security.Cryptography.Core;
+using System.Diagnostics;
 
 namespace Thiskord_Front.Services
 {
     public class AuthService
     {
-        // Simule un appel réseau
-        public async Task<AuthModels> SimulateLoginAsync()
+        private ApiService apiService;
+        public AuthService()
         {
-            // Simulation d'attente réseau (1 seconde)
-            await Task.Delay(1000);
-
-            // Retourne une fausse réponse conforme au format attendu
-            return new AuthModels
-            {
-                UserData = new Dictionary<string, string>
-                {
-                    { "user_name", "DevDiscord" },
-                    { "user_mail", "dev@discord-clone.com" },
-                    { "user_picture", "https://via.placeholder.com/150" }
-                },
-                ServerData = new Dictionary<string, int>
-                {
-                    { "fk_id_project", 42 }
-                }
-            };
+             apiService = new ApiService();
         }
+        // Simule un appel réseau
+        public async Task<AuthenticatedUser> login(string jsonRequest)
+        {
+            AuthenticatedUser? res;
+            string jsonResult = await this.apiService.CallApiAsync("auth/auth", "POST", jsonRequest);
+            System.Diagnostics.Debug.WriteLine("API payload: " + (jsonResult ?? "null"));
+            System.Diagnostics.Debug.WriteLine(jsonResult);
+            System.Diagnostics.Debug.WriteLine("connard");
+            if (!string.IsNullOrEmpty(jsonResult))
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                res = JsonSerializer.Deserialize<AuthenticatedUser>(jsonResult, options);
+            } else
+            {
+                res = null;
+            }
+            System.Diagnostics.Debug.Write(res);
+
+            return res ?? new AuthenticatedUser(new User("", "", ""), "");
+           
+        }
+        
     }
 }

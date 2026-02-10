@@ -7,6 +7,8 @@ using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Thiskord_Front.Services;
+using System.Net.Security;
+using Thiskord_Front.Models;
 
 namespace Thiskord_Front.ViewModels
 {
@@ -51,11 +53,12 @@ namespace Thiskord_Front.ViewModels
 
                 // 2. Création du format JSON demandé par ton collègue API
                 // Format: ["user_auth", "user_encrypted_pwd"]
-                var requestPayload = new List<string> { Username, encryptedPwd };
+                AuthRequest requestPayload = new AuthRequest(Username,  Password);
+                //var requestPayload = new List<string> { Username, encryptedPwd };
                 string jsonRequest = JsonSerializer.Serialize(requestPayload, new JsonSerializerOptions { WriteIndented = true });
-
+                System.Diagnostics.Debug.WriteLine(jsonRequest);
                 // 3. Appel simulé au service
-                var response = await _authService.SimulateLoginAsync();
+                var response = await _authService.login(jsonRequest);
 
                 // 4. Préparation de la réponse au format JSON
                 string jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
