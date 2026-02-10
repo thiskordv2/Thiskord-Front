@@ -48,15 +48,11 @@ namespace Thiskord_Front.ViewModels
 
             try
             {
-                // 1. Encryptage du mot de passe (Bcrypt)
-                string encryptedPwd = BCrypt.Net.BCrypt.HashPassword(Password);
 
-                // 2. Création du format JSON demandé par ton collègue API
-                // Format: ["user_auth", "user_encrypted_pwd"]
                 AuthRequest requestPayload = new AuthRequest(Username,  Password);
-                //var requestPayload = new List<string> { Username, encryptedPwd };
                 string jsonRequest = JsonSerializer.Serialize(requestPayload, new JsonSerializerOptions { WriteIndented = true });
                 System.Diagnostics.Debug.WriteLine(jsonRequest);
+                
                 // 3. Appel simulé au service
                 var response = await _authService.login(jsonRequest);
 

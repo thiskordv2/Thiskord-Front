@@ -1,3 +1,4 @@
+using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -28,6 +29,15 @@ namespace Thiskord_Front
         public MainWindow()
         {
             InitializeComponent();
+
+            // Récupérer l'identifiant de la fenêtre (Handle)
+            IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+            AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
+
+            // Définir l'icône (chemin vers votre fichier .ico dans Assets)
+            appWindow.SetIcon("Assets/asterion-logo.ico");
+
             AppWindow.TitleBar.PreferredTheme = TitleBarTheme.UseDefaultAppMode;
             // Center the window on the screen.
             CenterWindow();
