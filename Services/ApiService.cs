@@ -90,5 +90,31 @@ namespace Thiskord_Front.Services
                 return new List<Project>();
             }
         }
+
+        public async Task<List<Channel>> GetChannelsByProjectId(int projectId)
+        {
+            string jsonResult = await CallApiAsync($"channel/project/{projectId}", "GET");
+            
+            System.Diagnostics.Debug.WriteLine("Channels API payload: " + (jsonResult ?? "null"));
+
+            if (!string.IsNullOrEmpty(jsonResult))
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                try 
+                {
+                    var channels = JsonSerializer.Deserialize<List<Channel>>(jsonResult, options) ?? new List<Channel>();
+                    return channels;
+                }
+                catch (JsonException ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Erreur Désérialisation Channels: " + ex.Message);
+                    return new List<Channel>();
+                }
+            }
+            else
+            {
+                return new List<Channel>();
+            }
+        }
     }
 }

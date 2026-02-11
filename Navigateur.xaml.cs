@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
@@ -13,12 +14,18 @@ namespace Thiskord_Front
 
         private readonly ApiService _apiService = new ApiService();
         private bool _serverMenuInitialized;
+        
+       
+        public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
 
         public Navigateur()
         {
             InitializeComponent();
             NavigateurFrame = InnerFrame;
             InnerFrame.Navigate(typeof(ns_choice));
+            
+          
+            BaseExample.ItemsSource = Channels;
         }
 
         private async void ServerMenuFlyout_Opening(object sender, object e)
@@ -36,11 +43,13 @@ namespace Thiskord_Front
             {
                 foreach (var project in projects)
                 {
-                    ServerMenuFlyout.Items.Add(new MenuFlyoutItem
+                    var item = new MenuFlyoutItem
                     {
                         Text = project.name,
                         Tag = project
-                    });
+                    };
+                    item.Click += ServerMenuItem_Click;  
+                    ServerMenuFlyout.Items.Add(item);
                 }
                 _serverMenuInitialized = true; 
             }
@@ -55,6 +64,25 @@ namespace Thiskord_Front
                 ServerMenuFlyout.Hide();
                 if (target is not null)
                     ServerMenuFlyout.ShowAt(target);
+            }
+        }
+
+     
+        private async void ServerMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem item && item.Tag is Project project)
+            {
+                
+                Channels.Clear();
+                
+               
+                List<Channel> channels = await _apiService.GetChannelsByProjectId(project.id.Value);
+                
+                
+                foreach (var channel in channels)
+                {
+                    Channels.Add(channel);
+                }
             }
         }
     }
