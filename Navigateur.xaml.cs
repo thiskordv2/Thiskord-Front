@@ -57,14 +57,6 @@ namespace Thiskord_Front
             {
                 ServerMenuFlyout.Items.Add(new MenuFlyoutItem { Text = "Aucun projet trouvé", IsEnabled = false });
             }
-
-            if (ServerMenuFlyout.IsOpen)
-            {
-                var target = ServerMenuFlyout.Target as FrameworkElement;
-                ServerMenuFlyout.Hide();
-                if (target is not null)
-                    ServerMenuFlyout.ShowAt(target);
-            }
         }
 
      
