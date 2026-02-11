@@ -43,7 +43,7 @@ public sealed partial class Login : Page
             ContentDialog dialog = new ContentDialog
             {
                 XamlRoot = fe.XamlRoot,
-                Title = "Simulation Communication API",
+                Title = "Retour API",
                 Content = new ScrollViewer
                 {
                     MaxHeight = 600,
