@@ -72,16 +72,26 @@ namespace Thiskord_Front
         {
             if (sender is MenuFlyoutItem item && item.Tag is Project project)
             {
+                System.Diagnostics.Debug.WriteLine($"Projet cliqué: {project.name} (ID: {project.id})");
                 
                 Channels.Clear();
                 
-               
                 List<Channel> channels = await _apiService.GetChannelsByProjectId(project.id.Value);
                 
+                System.Diagnostics.Debug.WriteLine($"Channels reçus: {channels.Count}");
                 
                 foreach (var channel in channels)
                 {
+                    System.Diagnostics.Debug.WriteLine($"Ajout channel: {channel.Name}");
                     Channels.Add(channel);
+                }
+                
+                // Rouvrir le menu après le chargement
+                if (!ServerMenuFlyout.IsOpen)
+                {
+                    var target = ServerMenuFlyout.Target as FrameworkElement;
+                    if (target is not null)
+                        ServerMenuFlyout.ShowAt(target);
                 }
             }
         }
