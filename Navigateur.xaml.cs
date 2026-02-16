@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Documents;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Thiskord_Front.Models.Project;
@@ -36,13 +38,16 @@ namespace Thiskord_Front
             {
                 foreach (var project in projects)
                 {
-                    ServerMenuFlyout.Items.Add(new MenuFlyoutItem
+                    var menuItem = (new MenuFlyoutItem
                     {
                         Text = project.name,
-                        Tag = project
+                        Tag = project,
+
                     });
+                    menuItem.Click += OnOpenProject_Click;
+                    ServerMenuFlyout.Items.Add(menuItem);
                 }
-                _serverMenuInitialized = true; 
+                _serverMenuInitialized = true;
             }
             else
             {
@@ -55,6 +60,18 @@ namespace Thiskord_Front
                 ServerMenuFlyout.Hide();
                 if (target is not null)
                     ServerMenuFlyout.ShowAt(target);
+            }
+        }
+
+        private async void OnOpenProject_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine(sender);
+            if (sender is MenuFlyoutItem itemCliked)
+            {
+                if (itemCliked.Tag is Project project)
+                {
+                    openedProjectTitle.Text = project.name ?? "erreur d'affichage";
+                }
             }
         }
     }
