@@ -48,6 +48,7 @@
            Width="250" Margin="0,0,8,0"
         />
         <Button Style="{StaticResource SubtleButtonStyle}"
+           Click="RegisterButton_Click"     
            Content="Inscription"
            FontFamily="Arial"
            FontSize="16"

@@ -13,6 +13,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Thiskord_Front.ViewModels;
+using Thiskord_Front.Pages;
 
 namespace Thiskord_Front;
 
@@ -71,5 +72,10 @@ public sealed partial class Login : Page
                 this.Content = new Navigateur();
             }
         }
+    }
+
+    private async void RegisterButton_Click(object sender, RoutedEventArgs e)
+    {
+        this.Content = new InscriptionPage();
     }
 }
