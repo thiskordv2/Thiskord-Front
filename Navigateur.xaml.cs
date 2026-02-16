@@ -13,7 +13,7 @@ namespace Thiskord_Front
     {
         public static Frame NavigateurFrame { get; set; }
 
-        private readonly ApiService _apiService = new ApiService();
+        private readonly ProjectService _projectService = new ProjectService();
         private bool _serverMenuInitialized;
 
         public Navigateur()
@@ -31,7 +31,7 @@ namespace Thiskord_Front
             if (!ServerMenuFlyout.Items.Any())
                 ServerMenuFlyout.Items.Add(new MenuFlyoutItem { Text = "Chargement..." });
 
-            List<Project> projects = await _apiService.GetAllProjects();
+            List<Project> projects = await _projectService.GetAllProjects();
 
             ServerMenuFlyout.Items.Clear();
             if (projects.Count > 0)
