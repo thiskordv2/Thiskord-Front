@@ -19,7 +19,7 @@ namespace Thiskord_Front.Services
         {
             if (client.BaseAddress == null)
             {
-                client.BaseAddress = new Uri("https://localhost:7250/api/");
+                client.BaseAddress = new Uri("http://localhost:8080/api/");
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }

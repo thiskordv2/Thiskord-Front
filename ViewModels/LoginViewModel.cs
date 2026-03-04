@@ -51,7 +51,6 @@ namespace Thiskord_Front.ViewModels
 
                 AuthRequest requestPayload = new AuthRequest(Username,  Password);
                 string jsonRequest = JsonSerializer.Serialize(requestPayload, new JsonSerializerOptions { WriteIndented = true });
-                System.Diagnostics.Debug.WriteLine(jsonRequest);
                 
                 // 3. Appel simulé au service
                 var response = await _authService.login(jsonRequest);

@@ -18,12 +18,11 @@
              FontSize="24" 
              FontStyle="Italic" 
              TextWrapping="WrapWholeWords"
-             CharacterSpacing="200" 
-             Foreground="White"
+             CharacterSpacing="20" 
             HorizontalAlignment="Center"
         />
 
-        <TextBox Width="250" Margin="0,0,8,0" Height="60" Header="Nom" PlaceholderText="Username" 
+        <TextBox Width="250" Margin="0,0,8,0" Height="60" Header="Nom d'utilisateur" PlaceholderText="Username" 
         Text="{x:Bind ViewModel.Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
              IsEnabled="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"
             FontFamily="Arial"
@@ -48,6 +47,7 @@
            Width="250" Margin="0,0,8,0"
         />
         <Button Style="{StaticResource SubtleButtonStyle}"
+           Click="RegisterButton_Click"     
            Content="Inscription"
            FontFamily="Arial"
            FontSize="16"
