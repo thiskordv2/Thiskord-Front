@@ -17,9 +17,9 @@ namespace Thiskord_Front.Services
         {
             apiService = new ApiService();
         }
-    
 
-    public async Task<List<Project>> GetAllProjects()
+
+        public async Task<List<Project>> GetAllProjects()
         {
             loaded = false;
             string jsonResult = await apiService.CallApiAsync("project/all", "GET");
@@ -46,5 +46,29 @@ namespace Thiskord_Front.Services
                 return new List<Project>();
             }
         }
-    } 
-}
+
+        public async Task<List<Channel>> GetChannelsForProject(int projectId)
+        {
+            string jsonResult = await apiService.CallApiAsync($"project/{projectId}/channels", "GET");
+            System.Diagnostics.Debug.WriteLine("API payload for channels: " + (jsonResult ?? "null"));
+            if (!string.IsNullOrEmpty(jsonResult))
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                try
+                {
+                    var channels = JsonSerializer.Deserialize<List<Channel>>(jsonResult, options) ?? new List<Channel>();
+                    return channels;
+                }
+                catch (JsonException ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Erreur Désérialisation des channels: " + ex.Message);
+                    return new List<Channel>();
+                }
+            }
+            else
+            {
+                return new List<Channel>();
+            }
+        }
+    }
+} 
