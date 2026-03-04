@@ -45,7 +45,7 @@
             SelectionMode="Single">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="bonjour" FontSize="12" HorizontalAlignment="Center" Foreground="Gray"/>
+                        <TextBlock Text="{Binding DisplayName}" FontSize="12" HorizontalAlignment="Center" Foreground="Gray"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
