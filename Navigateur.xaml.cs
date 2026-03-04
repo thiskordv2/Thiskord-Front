@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
@@ -15,12 +16,18 @@ namespace Thiskord_Front
 
         private readonly ProjectService _projectService = new ProjectService();
         private bool _serverMenuInitialized;
+        
+       
+        public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
 
         public Navigateur()
         {
             InitializeComponent();
             NavigateurFrame = InnerFrame;
             InnerFrame.Navigate(typeof(ns_choice));
+            
+          
+            BaseExample.ItemsSource = Channels;
         }
 
         private async void ServerMenuFlyout_Opening(object sender, object e)
@@ -53,13 +60,34 @@ namespace Thiskord_Front
             {
                 ServerMenuFlyout.Items.Add(new MenuFlyoutItem { Text = "Aucun projet trouvé", IsEnabled = false });
             }
+        }
 
-            if (ServerMenuFlyout.IsOpen)
+     
+        private async void ServerMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem item && item.Tag is Project project)
             {
-                var target = ServerMenuFlyout.Target as FrameworkElement;
-                ServerMenuFlyout.Hide();
-                if (target is not null)
-                    ServerMenuFlyout.ShowAt(target);
+                System.Diagnostics.Debug.WriteLine($"Projet cliqué: {project.name} (ID: {project.id})");
+                
+                Channels.Clear();
+                
+                List<Channel> channels = await _apiService.GetChannelsByProjectId(project.id.Value);
+                
+                System.Diagnostics.Debug.WriteLine($"Channels reçus: {channels.Count}");
+                
+                foreach (var channel in channels)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Ajout channel: {channel.Name}");
+                    Channels.Add(channel);
+                }
+                
+                // Rouvrir le menu après le chargement
+                if (!ServerMenuFlyout.IsOpen)
+                {
+                    var target = ServerMenuFlyout.Target as FrameworkElement;
+                    if (target is not null)
+                        ServerMenuFlyout.ShowAt(target);
+                }
             }
         }
 
