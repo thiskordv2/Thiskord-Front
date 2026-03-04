@@ -71,7 +71,7 @@ namespace Thiskord_Front
                 
                 Channels.Clear();
                 
-                List<Channel> channels = await _apiService.GetChannelsByProjectId(project.id.Value);
+                List<Channel> channels = await _projectService.GetChannelsForProject(project.id.Value);
                 
                 System.Diagnostics.Debug.WriteLine($"Channels reçus: {channels.Count}");
                 
