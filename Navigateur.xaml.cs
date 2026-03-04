@@ -70,7 +70,7 @@ namespace Thiskord_Front
             {
                 if (itemCliked.Tag is Project project)
                 {
-                    openedProjectTitle.Text = project.name ?? "erreur d'affichage";
+                    openedProjectTitle.Content = project.name ?? "erreur d'affichage";
                 }
             }
         }
