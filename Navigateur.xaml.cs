@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Documents;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -12,7 +14,7 @@ namespace Thiskord_Front
     {
         public static Frame NavigateurFrame { get; set; }
 
-        private readonly ApiService _apiService = new ApiService();
+        private readonly ProjectService _projectService = new ProjectService();
         private bool _serverMenuInitialized;
         
        
@@ -36,22 +38,23 @@ namespace Thiskord_Front
             if (!ServerMenuFlyout.Items.Any())
                 ServerMenuFlyout.Items.Add(new MenuFlyoutItem { Text = "Chargement..." });
 
-            List<Project> projects = await _apiService.GetAllProjects();
+            List<Project> projects = await _projectService.GetAllProjects();
 
             ServerMenuFlyout.Items.Clear();
             if (projects.Count > 0)
             {
                 foreach (var project in projects)
                 {
-                    var item = new MenuFlyoutItem
+                    var menuItem = (new MenuFlyoutItem
                     {
                         Text = project.name,
-                        Tag = project
-                    };
-                    item.Click += ServerMenuItem_Click;  
-                    ServerMenuFlyout.Items.Add(item);
+                        Tag = project,
+
+                    });
+                    menuItem.Click += OnOpenProject_Click;
+                    ServerMenuFlyout.Items.Add(menuItem);
                 }
-                _serverMenuInitialized = true; 
+                _serverMenuInitialized = true;
             }
             else
             {
@@ -84,6 +87,18 @@ namespace Thiskord_Front
                     var target = ServerMenuFlyout.Target as FrameworkElement;
                     if (target is not null)
                         ServerMenuFlyout.ShowAt(target);
+                }
+            }
+        }
+
+        private async void OnOpenProject_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine(sender);
+            if (sender is MenuFlyoutItem itemCliked)
+            {
+                if (itemCliked.Tag is Project project)
+                {
+                    openedProjectTitle.Text = project.name ?? "erreur d'affichage";
                 }
             }
         }
