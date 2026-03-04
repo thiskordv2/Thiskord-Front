@@ -44,7 +44,7 @@ namespace Thiskord_Front
             CenterWindow();
 
 
-            this.Content = new InscriptionPage();
+            this.Content = new Login();
         }
 
         // Centers the given AppWindow on the screen based on the available display area.
