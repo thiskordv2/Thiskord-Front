@@ -1,32 +1,121 @@
+using ABI.Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Thiskord_Back.Models.Account;
+using Thiskord_Front.Models;
+using Thiskord_Front.Services;
+using Windows.UI;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
-namespace Thiskord_Front
+namespace Thiskord_Front.Pages
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class Inscription : Page
+    public sealed partial class InscriptionPage : Page
     {
-        public Inscription()
+        private readonly AuthService authService = new AuthService();
+
+        public InscriptionPage()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
+        private async void Button_Inscription_Click(object sender, RoutedEventArgs e)
+        {
+            // Récupère les valeurs des champs
+            string email = MailTextBox.Text?.Trim() ?? string.Empty;
+            string userName = UserTextBox.Text.Trim();
+            string password = PasswordBox1.Password.Trim();
+            string confirmPassword = PasswordBox2.Password.Trim();
+
+            // Vérifie que tous les champs sont remplis
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(userName) ||
+                string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword))
+            {
+                ShowMessage("Tous les champs sont obligatoires.", "error");
+                return;
+            }
+
+            if (!IsValidEmail(email))
+            {
+                ShowMessage("L'adresse e-mail n'est pas valide.", "error");
+                return;
+            }
+
+            // Vérifie que les mots de passe correspondent
+            if (password != confirmPassword)
+            {
+                ShowMessage("Les mots de passe ne correspondent pas.", "error");
+                return;
+            }
+
+            
+            ErrorTextBlock.Visibility = Visibility.Collapsed;
+            // Objet de requête
+            var userRequest = new UserAccount()
+            {
+                user_mail = email,
+                user_name = userName,
+                user_password = password
+            };
+
+            try
+            {
+                string jsonRequest = JsonSerializer.Serialize(userRequest);
+                var response = await authService.register(jsonRequest);
+
+                if (response is null)
+                {
+                    ShowMessage("Échec de la création du compte", "error");
+                    return;
+                }
+
+                ShowMessage("Inscription réussie ! \nRedirection en cours", "good");
+                await Task.Delay(2000);
+                this.Content = new Login(); 
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Une erreur est survenue : {ex.Message}", "error");
+            }
+
+        }
+
+        private void ShowMessage(string message, string opt)
+        {
+            ErrorTextBlock.Text = message;
+            ErrorTextBlock.Visibility = Visibility.Visible;
+            if (opt == "error") { ErrorTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Red); }
+            else if (opt == "good") { ErrorTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green); }
+            
+        }
+
+        private static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
+            string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+
+            try
+            {
+                return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return false;
+            }
+        }
+
+        private void Button_Connexion_Click(object sender, RoutedEventArgs e)
+        {
+            this.Content = new Login();
+        }
     }
 }

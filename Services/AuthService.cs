@@ -10,6 +10,7 @@ using System.Text.Json;
 using Thiskord_Front.Services;
 using Windows.Security.Cryptography.Core;
 using System.Diagnostics;
+using Thiskord_Back.Models.Account;
 
 namespace Thiskord_Front.Services
 {
@@ -42,5 +43,21 @@ namespace Thiskord_Front.Services
            
         }
         
+        public async Task<UserAccount> register(string jsonRequest)
+        {
+            UserAccount? res;
+            string jsonResult = await this.apiService.CallApiAsync("inscription/register", "POST", jsonRequest);
+            if (!string.IsNullOrEmpty(jsonResult))
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                res = JsonSerializer.Deserialize<UserAccount>(jsonResult, options);
+            }
+            else
+            {
+                res = null;
+            }
+            System.Diagnostics.Debug.Write(res);
+            return res;
+        }
     }
 }
