@@ -1,4 +1,4 @@
-<Page
+aa<Page
     x:Class="Thiskord_Front.Pages.InscriptionPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,62 +8,71 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel Orientation="Vertical" Spacing="20"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               Width="350"
-               Padding="20">
+    <Grid>
+        <StackPanel Orientation="Vertical" Spacing="60"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Width="350"
+                   >
 
-        <TextBlock Text="Inscription"
-                   FontFamily="Arial"
-                   FontSize="24"
-                   FontStyle="Italic"
-                   TextWrapping="WrapWholeWords"
-                   CharacterSpacing="200"
-                   HorizontalAlignment="Center"/>
+            <TextBlock Text="Inscription"
+                       FontFamily="Arial"
+                       FontSize="24"
+                       FontStyle="Italic"
+                       TextWrapping="WrapWholeWords"
+                       HorizontalAlignment="Center"/>
 
-        <TextBox x:Name="MailTextBox"
-                 Width="250"
-                 Height="40"
-                 Header="Mail"
-                 PlaceholderText="Entrez votre email"
-                 FontFamily="Arial"
-                 HorizontalAlignment="Stretch"
-                 VerticalAlignment="Center"/>
-
-        <TextBox x:Name="UserTextBox"
-                 Width="250"
-                 Height="40"
-                 Header="Nom d'utilisateur"
-                 PlaceholderText="Entrez votre nom d'utilisateur"
-                 FontFamily="Arial"
-                 HorizontalAlignment="Stretch"
-                 VerticalAlignment="Center"/>
-
-        <PasswordBox x:Name="PasswordBox1"
-                     Header="Mot de passe"
-                     PlaceholderText="Entrez votre mot de passe"
+            <TextBox x:Name="MailTextBox"
                      Width="250"
                      Height="40"
-                     PasswordRevealMode="Hidden"
+                     Header="Mail"
+                     PlaceholderText="Entrez votre email"
+                     FontFamily="Arial"
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Center"/>
 
-        <PasswordBox x:Name="PasswordBox2"
-                     Header="Vérification mot de passe"
-                     PlaceholderText="Confirmez votre mot de passe"
+            <TextBox x:Name="UserTextBox"
                      Width="250"
                      Height="40"
-                     PasswordRevealMode="Hidden"
+                     Header="Nom d'utilisateur"
+                     PlaceholderText="Entrez votre nom d'utilisateur"
+                     FontFamily="Arial"
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Center"/>
 
-        <Button Content="Inscription"
-                FontFamily="Arial"
-                FontSize="18"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Center"
-                Click="Button_Inscription_Click"/>
+            <PasswordBox x:Name="PasswordBox1"
+                         Header="Mot de passe"
+                         PlaceholderText="Entrez votre mot de passe"
+                         Width="250"
+                         Height="40"
+                         PasswordRevealMode="Hidden"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Center"/>
 
-    </StackPanel>
+            <PasswordBox x:Name="PasswordBox2"
+                         Header="Vérification mot de passe"
+                         PlaceholderText="Confirmez votre mot de passe"
+                         Width="250"
+                         Height="40"
+                         PasswordRevealMode="Hidden"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Center"/>
+
+            <TextBlock x:Name="ErrorTextBlock"
+                       Foreground="Red"
+                       Visibility="Collapsed"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       FontFamily="Arial"
+                       FontSize="14"
+                       Margin="0,10,0,10"/>
+
+            <Button Content="Inscription"
+                    FontFamily="Arial"
+                    FontSize="18"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Click="Button_Inscription_Click"/>
+        </StackPanel>
+    </Grid>
 </Page>

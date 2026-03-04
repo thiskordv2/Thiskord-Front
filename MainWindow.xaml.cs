@@ -15,6 +15,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics;
+using Thiskord_Front.Pages;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -30,12 +31,12 @@ namespace Thiskord_Front
         {
             InitializeComponent();
 
-            // Récupérer l'identifiant de la fenêtre (Handle)
+            // Rï¿½cupï¿½rer l'identifiant de la fenï¿½tre (Handle)
             IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
             WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
             AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
 
-            // Définir l'icône (chemin vers votre fichier .ico dans Assets)
+            // Dï¿½finir l'icï¿½ne (chemin vers votre fichier .ico dans Assets)
             appWindow.SetIcon("Assets/asterion-logo.ico");
 
             AppWindow.TitleBar.PreferredTheme = TitleBarTheme.UseDefaultAppMode;
@@ -43,7 +44,7 @@ namespace Thiskord_Front
             CenterWindow();
 
 
-            this.Content = new Login();
+            this.Content = new InscriptionPage();
         }
 
         // Centers the given AppWindow on the screen based on the available display area.

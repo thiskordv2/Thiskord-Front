@@ -1,10 +1,13 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Windows.UI;
+using ABI.Microsoft.UI;
 
 namespace Thiskord_Front.Pages
 {
@@ -17,7 +20,7 @@ namespace Thiskord_Front.Pages
             this.InitializeComponent();
         }
 
-        private async void Button_Inscription_Click(object sender, RoutedEventArgs e)
+        private void Button_Inscription_Click(object sender, RoutedEventArgs e)
         {
             // Récupère les valeurs des champs
             string email = MailTextBox.Text;
@@ -29,14 +32,14 @@ namespace Thiskord_Front.Pages
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(userName) ||
                 string.IsNullOrEmpty(password) || string.IsNullOrEmpty(confirmPassword))
             {
-                await ShowMessageDialog("Erreur", "Tous les champs sont obligatoires.");
+                ShowMessage("Tous les champs sont obligatoires.", true);
                 return;
             }
 
             // Vérifie que les mots de passe correspondent
             if (password != confirmPassword)
             {
-                await ShowMessageDialog("Erreur", "Les mots de passe ne correspondent pas.");
+                ShowMessage("Les mots de passe ne correspondent pas.", true);
                 return;
             }
 
@@ -54,56 +57,53 @@ namespace Thiskord_Front.Pages
                 // Convertit l'objet en JSON
                 string jsonRequest = JsonSerializer.Serialize(userRequest);
 
-                // Crée le contenu de la requête
+                // Crée ce qu'il y a dans la  requête
                 var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-                // Remplace cette URL par celle de ton API
-                var response = await _httpClient.PostAsync("http://ton-api-url/api/inscription/register", content);
-
-                string responseContent = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
+                // Utilisation de Task.Run pour éviter de bloquer l'UI
+                Task.Run(async () =>
                 {
-                    // Lit la réponse d'erreur
-                    var errorObject = JsonSerializer.Deserialize<InscriptionErrorResponse>(responseContent);
-                    await ShowMessageDialog("Erreur", errorObject.error);
-                }
-                else
-                {
-                    // Lit la réponse de succès
-                    var successObject = JsonSerializer.Deserialize<InscriptionSuccessResponse>(responseContent);
-                    await ShowMessageDialog("Succès", successObject.message);
-                }
+                    try
+                    {
+                        // URL de l'API ma is je sais pas faire 
+                        var response = await _httpClient.PostAsync("http://ton-api-url/api/inscription/register", content);
+
+                        string responseContent = await response.Content.ReadAsStringAsync();
+
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            this.DispatcherQueue.TryEnqueue(() =>
+                            {
+                                ShowMessage(responseContent, true);
+                            });
+                        }
+                        else
+                        {
+                            this.DispatcherQueue.TryEnqueue(() =>
+                            {
+                                ShowMessage("Inscription réussie!", false);
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        this.DispatcherQueue.TryEnqueue(() =>
+                        {
+                            ShowMessage($"Une erreur est survenue : {ex.Message}", true);
+                        });
+                    }
+                });
             }
             catch (Exception ex)
             {
-                await ShowMessageDialog("Erreur", $"Une erreur est survenue : {ex.Message}");
+                ShowMessage($"Une erreur est survenue : {ex.Message}", true);
             }
         }
 
-        private async Task ShowMessageDialog(string title, string message)
+        private void ShowMessage(string message, bool isError)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = title,
-                Content = message,
-                CloseButtonText = "OK",
-                XamlRoot = this.XamlRoot,
-            };
-
-            await dialog.ShowAsync();
+            ErrorTextBlock.Text = message;
+            ErrorTextBlock.Visibility = Visibility.Visible;
         }
-    }
-
-    // Classes pour désérialiser les réponses JSON
-    public class InscriptionErrorResponse
-    {
-        public string error { get; set; }
-    }
-
-    public class InscriptionSuccessResponse
-    {
-        public int userId { get; set; }
-        public string message { get; set; }
     }
 }
