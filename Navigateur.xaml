@@ -23,7 +23,8 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <DropDownButton Grid.Row="0" Content="Mes serveurs" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Center" Spacing="5">
+                <DropDownButton x:Name="openedProjectTitle" Grid.Row="0" Content="Mes serveurs" HorizontalAlignment="Center" Margin="0,10,0,0">
                 <DropDownButton.Flyout>
                     <MenuFlyout x:Name="ServerMenuFlyout" 
                                 Placement="Bottom" 
@@ -32,6 +33,8 @@
                     </MenuFlyout>
                 </DropDownButton.Flyout>
             </DropDownButton>
+
+            </StackPanel>
 
             <ListView
             Grid.Row="1"
@@ -42,7 +45,7 @@
             SelectionMode="Single">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}" FontSize="12" HorizontalAlignment="Center"/>
+                        <TextBlock Text="bonjour" FontSize="12" HorizontalAlignment="Center" Foreground="Gray"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

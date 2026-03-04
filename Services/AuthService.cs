@@ -39,7 +39,7 @@ namespace Thiskord_Front.Services
             }
             System.Diagnostics.Debug.Write(res);
 
-            return res ?? new AuthenticatedUser(new User("", "", ""), "");
+            return res ?? new AuthenticatedUser();
            
         }
         
