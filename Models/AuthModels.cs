@@ -15,6 +15,9 @@ namespace Thiskord_Front.Models
         [JsonPropertyName("password")]
         public string password { get; set; } = "";
 
+        public AuthRequest()
+        {
+        }
         public AuthRequest(string _userAuth, string _password)
         {
             this.userAuth = _userAuth;
@@ -30,27 +33,14 @@ namespace Thiskord_Front.Models
         public string userMail { get; set; } = "";
         [JsonPropertyName("user_picture")]
         public string userPicture { get; set; } = "";
-
-        public User(string _userName, string _userMail, string _userPicture)
-        {
-            this.userName = _userName;
-            this.userMail = _userMail;
-            this.userPicture = _userPicture;
-        }
     }
     public class AuthenticatedUser
     {
         [JsonPropertyName("user")]
-        public User user { get; set; } = new User("", "", "");
+        public User user { get; set; } = new User();
 
         [JsonPropertyName("token")]
         public string token { get; set; } = "";
-
-        [JsonConstructor]
-        public AuthenticatedUser(User _user, string _token)
-        {
-            this.user = _user;
-            this.token = _token;
-        }
+        
     }
 }
