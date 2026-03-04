@@ -1,4 +1,4 @@
-aa<Page
+<Page
     x:Class="Thiskord_Front.Pages.InscriptionPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -24,7 +24,7 @@ aa<Page
 
             <TextBox x:Name="MailTextBox"
                      Width="250"
-                     Height="40"
+                     Height="80"
                      Header="Mail"
                      PlaceholderText="Entrez votre email"
                      FontFamily="Arial"
@@ -33,7 +33,7 @@ aa<Page
 
             <TextBox x:Name="UserTextBox"
                      Width="250"
-                     Height="40"
+                     Height="80"
                      Header="Nom d'utilisateur"
                      PlaceholderText="Entrez votre nom d'utilisateur"
                      FontFamily="Arial"
@@ -44,7 +44,7 @@ aa<Page
                          Header="Mot de passe"
                          PlaceholderText="Entrez votre mot de passe"
                          Width="250"
-                         Height="40"
+                         Height="80"
                          PasswordRevealMode="Hidden"
                          HorizontalAlignment="Stretch"
                          VerticalAlignment="Center"/>
@@ -53,7 +53,7 @@ aa<Page
                          Header="Vérification mot de passe"
                          PlaceholderText="Confirmez votre mot de passe"
                          Width="250"
-                         Height="40"
+                         Height="80"
                          PasswordRevealMode="Hidden"
                          HorizontalAlignment="Stretch"
                          VerticalAlignment="Center"/>
