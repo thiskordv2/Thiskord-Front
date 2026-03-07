@@ -49,7 +49,7 @@ namespace Thiskord_Front.Services
 
         public async Task<List<Channel>> GetChannelsForProject(int projectId)
         {
-            string jsonResult = await apiService.CallApiAsync($"project/{projectId}/channels", "GET");
+            string jsonResult = await apiService.CallApiAsync($"channel/project/{projectId}", "GET");
             System.Diagnostics.Debug.WriteLine("API payload for channels: " + (jsonResult ?? "null"));
             if (!string.IsNullOrEmpty(jsonResult))
             {

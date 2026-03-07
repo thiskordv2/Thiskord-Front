@@ -19,7 +19,6 @@ namespace Thiskord_Front
         
        
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
-
         public Navigateur()
         {
             InitializeComponent();
@@ -27,7 +26,7 @@ namespace Thiskord_Front
             InnerFrame.Navigate(typeof(ns_choice));
             
           
-            BaseExample.ItemsSource = Channels;
+            channelListing.ItemsSource = Channels;
         }
 
         private async void ServerMenuFlyout_Opening(object sender, object e)
@@ -99,8 +98,30 @@ namespace Thiskord_Front
                 if (itemCliked.Tag is Project project)
                 {
                     openedProjectTitle.Content = project.name ?? "erreur d'affichage";
+                    Channels.Clear();
+                    System.Diagnostics.Debug.WriteLine(project.id);
+
+                    List<Channel> channels = await _projectService.GetChannelsForProject(project.id.Value);
+
+                    System.Diagnostics.Debug.WriteLine($"Channels reçus: {channels.Count}");
+
+                    foreach (var channel in channels)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Ajout channel: {channel.Name}");
+                        Channels.Add(channel);
+                    }
                 }
             }
         }
+
+        private void channelListing_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (channelListing.SelectedItem is Channel selectedChannel)
+            {
+                InnerFrame.Navigate(typeof(ChannelPage), selectedChannel);
+            }
+        }
+
+        
     }
 }
