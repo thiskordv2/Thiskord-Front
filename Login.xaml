@@ -16,10 +16,11 @@
         <TextBlock Text="Connexion"
              FontFamily="Arial"
              FontSize="24" 
-             FontStyle="Italic" 
              TextWrapping="WrapWholeWords"
              CharacterSpacing="20" 
-            HorizontalAlignment="Center"
+             HorizontalAlignment="Center"
+             Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+             Style="{StaticResource TitleTextBlockStyle}"
         />
 
         <TextBox Width="250" Margin="0,0,8,0" Height="60" Header="Nom d'utilisateur" PlaceholderText="Username" 
