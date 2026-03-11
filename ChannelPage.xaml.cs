@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Collections.ObjectModel;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -24,9 +25,12 @@ namespace Thiskord_Front
     /// </summary>
     public sealed partial class ChannelPage : Page
     {
+        public ObservableCollection<Message> Messages { get; } = new ObservableCollection<Message>();
+
         public ChannelPage()
         {
             InitializeComponent();
+            InvertedListView.ItemsSource = Messages;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -35,7 +39,9 @@ namespace Thiskord_Front
 
             if (e.Parameter is Channel channel)
             {
-                // utiliser channel ici
+                Messages.Clear();
+                Messages.Add(new Message { MsgText = $"Bienvenue dans #{channel.Name}", MsgDateTime = DateTime.Now.ToString("HH:mm"), MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left });
+                Messages.Add(new Message { MsgText = "Message de test", MsgDateTime = DateTime.Now.ToString("HH:mm"), MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Right });
             }
         }
     }
