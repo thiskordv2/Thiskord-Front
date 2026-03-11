@@ -143,7 +143,7 @@ namespace Thiskord_Front
             switch (item.Tag as string)
             {
                 case "edit":
-                    // TODO : logique d'édition
+                    await EditChannelAsync(_contextMenuChannel);
                     break;
 
                 case "delete":
@@ -152,6 +152,99 @@ namespace Thiskord_Front
             }
 
             _contextMenuChannel = null;
+        }
+
+        private async Task EditChannelAsync(Channel channel)
+        {
+            if (channel.Id is null) return;
+
+            // Créer les TextBox pour l'édition
+            var nameTextBox = new TextBox
+            {
+                Text = channel.Name ?? "",
+                PlaceholderText = "Nom du channel",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var descriptionTextBox = new TextBox
+            {
+                Text = channel.Description ?? "",
+                PlaceholderText = "Description (optionnelle)",
+                AcceptsReturn = true,
+                Height = 100,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            // Créer un StackPanel pour contenir les contrôles
+            var contentPanel = new StackPanel
+            {
+                Spacing = 10,
+                Children =
+                {
+                    new TextBlock { Text = "Nom:", FontWeight = Windows.UI.Text.FontWeights.Bold },
+                    nameTextBox,
+                    new TextBlock { Text = "Description:", FontWeight = Windows.UI.Text.FontWeights.Bold },
+                    descriptionTextBox
+                }
+            };
+
+            // Créer et afficher le ContentDialog
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = $"Modifier le channel « {channel.Name} »",
+                Content = contentPanel,
+                PrimaryButtonText = "Enregistrer",
+                SecondaryButtonText = "Annuler"
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                string newName = nameTextBox.Text?.Trim() ?? channel.Name;
+                string newDescription = descriptionTextBox.Text?.Trim() ?? "";
+
+                if (string.IsNullOrWhiteSpace(newName))
+                {
+                    var errorDialog = new ContentDialog
+                    {
+                        XamlRoot = this.XamlRoot,
+                        Title = "Erreur",
+                        Content = "Le nom du channel ne peut pas être vide.",
+                        PrimaryButtonText = "OK"
+                    };
+                    await errorDialog.ShowAsync();
+                    return;
+                }
+
+                bool success = await _channelService.EditChannel(channel.Id.Value, newName, newDescription);
+
+                if (success)
+                {
+                    // Mettre à jour le channel dans la collection
+                    channel.Name = newName;
+                    channel.Description = newDescription;
+
+                    // Forcer le refresh de l'UI
+                    var index = Channels.IndexOf(channel);
+                    if (index >= 0)
+                    {
+                        Channels[index] = channel;
+                    }
+                }
+                else
+                {
+                    var errorDialog = new ContentDialog
+                    {
+                        XamlRoot = this.XamlRoot,
+                        Title = "Erreur",
+                        Content = $"Impossible de modifier le channel « {channel.Name} ».",
+                        PrimaryButtonText = "OK"
+                    };
+                    await errorDialog.ShowAsync();
+                }
+            }
         }
 
         private async Task DeleteChannelAsync(Channel channel)

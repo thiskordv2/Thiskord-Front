@@ -18,5 +18,11 @@ namespace Thiskord_Front.Services
             string? result = await _apiService.CallApiAsync($"channel/{channelId}", "DELETE");
             return result != null;
         }
+        public async Task<bool> EditChannel(int channelId)
+        {
+            // CallApiAsync retourne null en cas d'erreur, string (vide ou JSON) en cas de succès
+            string? result = await _apiService.CallApiAsync($"channel/{channelId}", "PUT");
+            return result != null;
+        }
     }
 }
