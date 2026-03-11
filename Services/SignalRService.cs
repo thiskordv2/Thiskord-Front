@@ -1,43 +1,86 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Thiskord_Front.Models.Project;
 
 namespace Thiskord_Front.Services
 {
     public class ChatService
-    {    
-        private HubConnection _hubConnection;
+    {
+        private static readonly Lazy<ChatService> _instance = new(() => new ChatService());
+        public static ChatService Instance => _instance.Value;
 
-        public event Action<string, string> OnMessageReceived;
+        private HubConnection? _hubConnection;
+        private int? _currentChannelId;
 
-        public async Task ConnectAsync(string token)
+        public event Action<Message>? OnMessageReceived;
+        public readonly SessionService _sessionService;
+
+        private ChatService()
         {
+            _sessionService = SessionService.Instance;
+        }
+
+        public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
+
+        public async Task ConnectAsync()
+        {
+            if (IsConnected) return;
+
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl("[https://votre-api.com/chatHub](https://votre-api.com/chatHub)", options =>
+                .WithUrl("http://localhost:8080/chatHub", options =>
                 {
-                    // Envoi du Token JWT pour l'authentification
-                    options.AccessTokenProvider = () => Task.FromResult(token);
+                    options.AccessTokenProvider = () => Task.FromResult(_sessionService.Token);
+                    options.Headers["username"] = _sessionService.CurrentUser;
                 })
-                .WithAutomaticReconnect() // Reconnexion auto si coupure internet
+                .WithAutomaticReconnect()
                 .Build();
 
-            // Écouter les événements du serveur (Broadcast)
-            _hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+            _hubConnection.On<string, string, string>("ReceiveMessage", (user, text, dateTime) =>
             {
-                // Déclencher un événement pour que le ViewModel mette à jour l'UI
-                OnMessageReceived?.Invoke(user, message);
+                var message = new Message
+                {
+                    MsgText = $"{user} : {text}",
+                    MsgDateTime = dateTime,
+                    MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
+                };
+                OnMessageReceived?.Invoke(message);
             });
 
             await _hubConnection.StartAsync();
         }
 
-        // Envoyer un message au serveur
-        public async Task SendMessageAsync(string user, string message)
+        public async Task JoinChannelAsync(int channelId)
         {
-            await _hubConnection.InvokeAsync("SendMessage", user, message);
+            if (!IsConnected) return;
+
+            if (_currentChannelId.HasValue)
+                await _hubConnection!.InvokeAsync("LeaveChannel", _currentChannelId.Value);
+
+            await _hubConnection!.InvokeAsync("JoinChannel", channelId);
+            _currentChannelId = channelId;
+        }
+
+        public async Task LeaveCurrentChannelAsync()
+        {
+            if (!IsConnected || !_currentChannelId.HasValue) return;
+
+            await _hubConnection!.InvokeAsync("LeaveChannel", _currentChannelId.Value);
+            _currentChannelId = null;
+        }
+
+        public async Task SendMessageAsync(string text)
+        {
+            if (!IsConnected || !_currentChannelId.HasValue) return;
+
+            await _hubConnection!.InvokeAsync("SendMessage", _currentChannelId.Value, text);
+        }
+
+        public async Task DisconnectAsync()
+        {
+            if (_hubConnection is not null)
+                await _hubConnection.StopAsync();
         }
     }
 }

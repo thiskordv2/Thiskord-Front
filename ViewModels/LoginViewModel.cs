@@ -15,6 +15,7 @@ namespace Thiskord_Front.ViewModels
     public partial class LoginViewModel : ObservableObject
     {
         private readonly AuthService _authService;
+        private readonly SessionService _sessionService;
 
         // Propriétés liées à la Vue (Binding)
         [ObservableProperty]
@@ -36,6 +37,7 @@ namespace Thiskord_Front.ViewModels
         public LoginViewModel()
         {
             _authService = new AuthService();
+            _sessionService = SessionService.Instance;
         }
 
         [RelayCommand]
@@ -45,7 +47,6 @@ namespace Thiskord_Front.ViewModels
                 return;
 
             IsLoading = true;
-
             try
             {
 
@@ -57,7 +58,9 @@ namespace Thiskord_Front.ViewModels
 
                 // 4. Préparation de la réponse au format JSON
                 string jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
-
+                string user = response.user.userName;
+                string token = response.token;
+                _sessionService.Login(user, token);
                 // 5. Combinaison de la requête et de la réponse pour affichage
                 string fullInfo = $"=== REQUÊTE ENVOYÉE ===\n{jsonRequest}\n\n=== RÉPONSE REÇUE ===\n{jsonResponse}";
 
