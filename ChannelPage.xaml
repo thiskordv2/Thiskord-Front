@@ -8,6 +8,25 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <DataTemplate x:Key="MessageViewTemplate">
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0"
+                           Text="{Binding Author}"
+                           FontWeight="SemiBold"
+                           Margin="4,4,4,0"/>
+                <TextBlock Grid.Row="1"
+                           Text="{Binding Content}"
+                           TextWrapping="Wrap"
+                           Margin="4,0,4,4"/>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid>
         <ListView x:Name="InvertedListView"
              ItemTemplate="{StaticResource MessageViewTemplate}">
