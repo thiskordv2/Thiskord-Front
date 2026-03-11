@@ -33,20 +33,33 @@ namespace Thiskord_Front.Services
                 switch (method.ToUpper())
                 {
                     case "POST":
-                        var content = new StringContent(
+                        var postContent = new StringContent(
                             jsonRequest ?? "",
                             Encoding.UTF8,
                             "application/json"
                         );
-                        response = await client.PostAsync(route, content);
+                        response = await client.PostAsync(route, postContent);
                         break;
+
                     case "DELETE":
                         response = await client.DeleteAsync(route);
                         break;
+
+                    case "PUT":  
+                        var putContent = new StringContent(
+                            jsonRequest ?? "",
+                            Encoding.UTF8,
+                            "application/json"
+                        );
+                        response = await client.PutAsync(route, putContent);  
+                        break;
+
                     case "GET":
                     default:
                         response = await client.GetAsync(route);
                         break;
+
+
                 }
 
                 if (response != null && response.IsSuccessStatusCode)
