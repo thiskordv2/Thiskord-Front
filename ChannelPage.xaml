@@ -9,6 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+<<<<<<< HEAD
     <Page.Resources>
         <DataTemplate x:Key="MessageViewTemplate" x:DataType="models:Message">
             <Grid Height="Auto" Margin="4" HorizontalAlignment="{x:Bind MsgAlignment}">
@@ -21,11 +22,13 @@
     </Page.Resources>
 
     <Grid>
+=======
+    <!-- <Grid>
+>>>>>>> 9ed2046 (Ajout d'un service SignalR pour la communication message)
         <ListView x:Name="InvertedListView"
              ItemTemplate="{StaticResource MessageViewTemplate}">
 
-            <!-- The ItemsStackPanel must be edited to update the following two properties -->
-            <!-- These properties allow the list to grow from the bottom -->
+           
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView"
@@ -33,12 +36,12 @@
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
 
-            <!-- This setter property is created so ListViewItems correctly align to the left or right. -->
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
-    </Grid>
-</Page>
+    </Grid> -->
+    <TextBlock Text="Channel Page" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
+</Page> 
