@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Thiskord_Front.Services;
-using System.Net.Security;
 using Thiskord_Front.Models;
 
 namespace Thiskord_Front.ViewModels
@@ -15,6 +11,7 @@ namespace Thiskord_Front.ViewModels
     public partial class LoginViewModel : ObservableObject
     {
         private readonly AuthService _authService;
+        private readonly SessionService _sessionService;
 
         // Propriétés liées à la Vue (Binding)
         [ObservableProperty]
@@ -29,13 +26,15 @@ namespace Thiskord_Front.ViewModels
 
         public bool IsNotLoading => !IsLoading;
 
-        // Événement pour demander à la Vue d'afficher la Popup
-        // (Le VM ne doit pas manipuler l'UI directement)
-        public event Action<string>? OnSimulationPopupRequested;
+        // Succès → la Vue navigue vers Navigateur
+        public event Action? OnLoginSuccess;
+        // Échec → la Vue affiche le message d'erreur
+        public event Action<string>? OnLoginFailed;
 
         public LoginViewModel()
         {
             _authService = new AuthService();
+            _sessionService = new SessionService();
         }
 
         [RelayCommand]
@@ -45,7 +44,6 @@ namespace Thiskord_Front.ViewModels
                 return;
 
             IsLoading = true;
-
             try
             {
 
@@ -53,16 +51,22 @@ namespace Thiskord_Front.ViewModels
                 string jsonRequest = JsonSerializer.Serialize(requestPayload, new JsonSerializerOptions { WriteIndented = true });
                 
                 // 3. Appel simulé au service
-                var response = await _authService.login(jsonRequest);
+                AuthenticatedUser response = await _authService.login(jsonRequest);
 
-                // 4. Préparation de la réponse au format JSON
-                string jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
-
-                // 5. Combinaison de la requête et de la réponse pour affichage
-                string fullInfo = $"=== REQUÊTE ENVOYÉE ===\n{jsonRequest}\n\n=== RÉPONSE REÇUE ===\n{jsonResponse}";
-
-                // 6. Déclencher l'événement pour afficher la popup dans la Vue
-                OnSimulationPopupRequested?.Invoke(fullInfo);
+                // 4. Vérification de la réponse et actions appropriées
+                if (!string.IsNullOrEmpty(response.token))
+                {
+                    _sessionService.Login(response.user.userName, response.token);
+                    OnLoginSuccess?.Invoke();
+                }
+                else
+                {
+                    OnLoginFailed?.Invoke("Identifiants incorrects.");
+                }
+            }
+            catch (Exception ex)
+            {
+                OnLoginFailed?.Invoke($"Erreur de connexion : {ex.Message}");
             }
             finally
             {

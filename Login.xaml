@@ -36,6 +36,12 @@
             AutomationProperties.Name="Sample password box" IsEnabled="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"
             PasswordChanged="PasswordBox_PasswordChanged"
         />
+        
+        <TextBlock x:Name="LoginErrorText"
+           Foreground="Red"
+           FontSize="12"
+           HorizontalAlignment="Center"
+           Visibility="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"/>
 
         <Button Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.LoginCommand}" 
            IsEnabled="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"

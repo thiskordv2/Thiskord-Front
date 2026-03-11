@@ -1,59 +1,83 @@
 using Microsoft.UI;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Graphics;
-using Thiskord_Front.Pages;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using Windows.UI;
+using WinRT;
 
 namespace Thiskord_Front
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainWindow : Window
     {
+        private DesktopAcrylicController _acrylicController;
+        private SystemBackdropConfiguration _backdropConfig;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            // R�cup�rer l'identifiant de la fen�tre (Handle)
+            this.ExtendsContentIntoTitleBar = true;
+            this.SetTitleBar(AppTitleBar);
+
             IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
             WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
             AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
-
-            // D�finir l'ic�ne (chemin vers votre fichier .ico dans Assets)
             appWindow.SetIcon("Assets/asterion-logo.ico");
-
             AppWindow.TitleBar.PreferredTheme = TitleBarTheme.UseDefaultAppMode;
-            // Center the window on the screen.
+
             CenterWindow();
+            SetupAcrylic();
 
-
-            this.Content = new Login();
+            RootFrame.Navigate(typeof(Login));
         }
 
-        // Centers the given AppWindow on the screen based on the available display area.
+        private void SetupAcrylic()
+        {
+            if (!DesktopAcrylicController.IsSupported())
+                return;
+
+            _backdropConfig = new SystemBackdropConfiguration
+            {
+                IsInputActive = true,
+                Theme = SystemBackdropTheme.Dark
+            };
+
+            _acrylicController = new DesktopAcrylicController
+            {
+                TintColor         = Color.FromArgb(255, 32, 32, 32),
+                TintOpacity       = 0.75f,
+                LuminosityOpacity = 0.85f,
+                Kind              = DesktopAcrylicKind.Base
+            };
+
+            // ICompositionSupportsSystemBackdrop est dans Microsoft.UI.Composition
+            _acrylicController.AddSystemBackdropTarget(
+                this.As<ICompositionSupportsSystemBackdrop>()
+            );
+            _acrylicController.SetSystemBackdropConfiguration(_backdropConfig);
+
+            this.Activated += (s, e) =>
+                _backdropConfig.IsInputActive =
+                    e.WindowActivationState != WindowActivationState.Deactivated;
+
+            this.Closed += (s, e) =>
+            {
+                _acrylicController.Dispose();
+                _acrylicController = null;
+            };
+        }
+
         private void CenterWindow()
         {
             var area = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Nearest)?.WorkArea;
             if (area == null) return;
-            AppWindow.Move(new PointInt32((area.Value.Width - AppWindow.Size.Width) / 2, (area.Value.Height - AppWindow.Size.Height) / 2));
+            AppWindow.Move(new PointInt32(
+                (area.Value.Width - AppWindow.Size.Width) / 2,
+                (area.Value.Height - AppWindow.Size.Height) / 2
+            ));
         }
-
     }
 }
