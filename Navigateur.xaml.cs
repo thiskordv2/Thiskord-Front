@@ -119,6 +119,8 @@ namespace Thiskord_Front
             if (channelListing.SelectedItem is Channel selectedChannel)
             {
                 InnerFrame.Navigate(typeof(ChannelPage), selectedChannel);
+                // Clear selection so the same channel can be clicked again to re-navigate.
+                channelListing.SelectedItem = null;
             }
         }
 
