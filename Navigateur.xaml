@@ -46,7 +46,14 @@
             SelectionChanged="channelListing_SelectionChanged">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding DisplayName}" FontSize="12" HorizontalAlignment="Left" Foreground="Gray" />
+                        <TextBlock Text="{Binding DisplayName}" FontSize="12" HorizontalAlignment="Left" Foreground="Gray">
+                            <TextBlock.ContextFlyout>
+                                <MenuFlyout Opening="ChannelContextMenu_Opening">
+                                    <MenuFlyoutItem Tag="edit" Text="Modifier" Icon="Edit" Click="ChannelContextMenu_Click"/>
+                                    <MenuFlyoutItem Tag="delete" Text="Supprimer" Icon="Delete" Click="ChannelContextMenu_Click"/>
+                                </MenuFlyout>
+                            </TextBlock.ContextFlyout>
+                        </TextBlock>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
