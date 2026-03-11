@@ -40,26 +40,21 @@ namespace Thiskord_Front.Services
                         );
                         response = await client.PostAsync(route, postContent);
                         break;
-
-                    case "DELETE":
-                        response = await client.DeleteAsync(route);
-                        break;
-
-                    case "PUT":  
+                    case "PUT":
                         var putContent = new StringContent(
                             jsonRequest ?? "",
                             Encoding.UTF8,
                             "application/json"
                         );
-                        response = await client.PutAsync(route, putContent);  
+                        response = await client.PutAsync(route, putContent);
                         break;
-
+                    case "DELETE":
+                        response = await client.DeleteAsync(route);
+                        break;
                     case "GET":
                     default:
                         response = await client.GetAsync(route);
                         break;
-
-
                 }
 
                 if (response != null && response.IsSuccessStatusCode)

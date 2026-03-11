@@ -181,9 +181,9 @@ namespace Thiskord_Front
                 Spacing = 10,
                 Children =
                 {
-                    new TextBlock { Text = "Nom:", FontWeight = Windows.UI.Text.FontWeights.Bold },
+                    new TextBlock { Text = "Nom:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
                     nameTextBox,
-                    new TextBlock { Text = "Description:", FontWeight = Windows.UI.Text.FontWeights.Bold },
+                    new TextBlock { Text = "Description:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
                     descriptionTextBox
                 }
             };
