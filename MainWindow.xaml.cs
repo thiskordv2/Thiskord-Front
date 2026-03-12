@@ -1,3 +1,4 @@
+using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -14,6 +15,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics;
+using Thiskord_Front.Pages;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -28,6 +30,15 @@ namespace Thiskord_Front
         public MainWindow()
         {
             InitializeComponent();
+
+            // R�cup�rer l'identifiant de la fen�tre (Handle)
+            IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+            AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
+
+            // D�finir l'ic�ne (chemin vers votre fichier .ico dans Assets)
+            appWindow.SetIcon("Assets/asterion-logo.ico");
+
             AppWindow.TitleBar.PreferredTheme = TitleBarTheme.UseDefaultAppMode;
             // Center the window on the screen.
             CenterWindow();
