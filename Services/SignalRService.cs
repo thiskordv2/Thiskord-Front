@@ -70,8 +70,6 @@ namespace Thiskord_Front.Services
                 OnMessageReceived?.Invoke(message);
             });
 
-            await _hubConnection.StartAsync();
-
             _hubConnection.On<string, string>("UserJoined", (user, text) =>
             {
                 var message = new Message
@@ -81,6 +79,8 @@ namespace Thiskord_Front.Services
                 };
                 OnMessageReceived?.Invoke(message);
             });
+
+            await _hubConnection.StartAsync();
         }
 
         public async Task JoinChannelAsync(int channelId)
