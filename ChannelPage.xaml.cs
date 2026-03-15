@@ -1,11 +1,13 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Input;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
+using Windows.System;
 
 namespace Thiskord_Front
 {
@@ -37,13 +39,6 @@ namespace Thiskord_Front
             {
                 await _chatService.ConnectAsync();
                 await _chatService.JoinChannelAsync(channel.Id!.Value);
-
-                Messages.Add(new Message
-                {
-                    MsgText = $"Connecté à #{channel.Name}",
-                    MsgDateTime = DateTime.Now.ToString("HH:mm"),
-                    MsgAlignment = HorizontalAlignment.Left
-                });
             }
             catch (Exception ex)
             {
@@ -81,6 +76,18 @@ namespace Thiskord_Front
             else
             {
                 System.Diagnostics.Debug.WriteLine("Erreur, message vide");
+            }
+        }
+
+        private void TextBox_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key != VirtualKey.Enter)
+                return;
+
+            if (e.Key == VirtualKey.Enter)
+            {
+                OnSendButton_Click(sender, e);
+                e.Handled = true;
             }
         }
     }

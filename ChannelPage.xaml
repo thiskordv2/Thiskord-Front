@@ -12,8 +12,8 @@
     <Page.Resources>
         <DataTemplate x:Key="MessageViewTemplate" x:DataType="models:Message">
             <Grid Height="Auto" Margin="4" HorizontalAlignment="{x:Bind MsgAlignment}">
-                <StackPanel MinHeight="75" Width="350" Padding="10, 0, 0, 10" Background="{ThemeResource SystemColorHighlightColor}" CornerRadius="{StaticResource ControlCornerRadius}">
-                    <TextBlock Text="{x:Bind MsgText}" Padding="0, 10, 0, 0" FontSize="20" Foreground="{ThemeResource SystemColorHighlightTextColor}"/>
+                <StackPanel MinHeight="75" MaxWidth="650" Padding="10, 0, 0, 10" Background="{ThemeResource SystemColorHighlightColor}" CornerRadius="{StaticResource ControlCornerRadius}">
+                    <TextBlock Text="{x:Bind MsgText}" Padding="0, 10, 0, 0" FontSize="20" Foreground="{ThemeResource SystemColorHighlightTextColor}" TextWrapping="Wrap"/>
                     <TextBlock Text="{x:Bind MsgDateTime}" Padding="0, 0, 0, 10" FontSize="15" Foreground="{ThemeResource SystemColorHighlightTextColor}"/>
                 </StackPanel>
             </Grid>
@@ -52,8 +52,8 @@
             <TextBox Grid.Column="0"
                  AutomationProperties.Name="multi-line TextBox"
                  TextWrapping="Wrap" 
-                 AcceptsReturn="True" 
                  IsSpellCheckEnabled="True"
+                 PreviewKeyDown="TextBox_PreviewKeyDown"
                  SelectionHighlightColor="SteelBlue"
                  Margin="0,0,10,0"
                  x:Name="MessageInput"

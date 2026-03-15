@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Thiskord_Front.Models.Project;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Thiskord_Front.Services
 {
@@ -32,23 +34,53 @@ namespace Thiskord_Front.Services
                 .WithUrl("http://localhost:8080/chatHub", options =>
                 {
                     options.AccessTokenProvider = () => Task.FromResult(_sessionService.Token);
-                    options.Headers["username"] = _sessionService.CurrentUser;
+                    // options.Headers["username"] = _sessionService.CurrentUser;
                 })
                 .WithAutomaticReconnect()
                 .Build();
 
+            _hubConnection.On<List<MessageDto>>("LoadMessages", (messages) =>
+            {
+               
+                foreach (var m in messages)
+                {
+                    var alignement = m.User == _sessionService.CurrentUser
+                    ? Microsoft.UI.Xaml.HorizontalAlignment.Right
+                    : Microsoft.UI.Xaml.HorizontalAlignment.Left;
+                    OnMessageReceived?.Invoke(new Message
+                    {
+                        MsgText = $"{m.User} : {m.Text}",
+                        MsgDateTime = m.DateTime,
+                        MsgAlignment = alignement
+                    });
+                }
+            });
+
             _hubConnection.On<string, string, string>("ReceiveMessage", (user, text, dateTime) =>
             {
+                var alignement = user == _sessionService.CurrentUser
+                    ? Microsoft.UI.Xaml.HorizontalAlignment.Right
+                    : Microsoft.UI.Xaml.HorizontalAlignment.Left; 
                 var message = new Message
                 {
                     MsgText = $"{user} : {text}",
                     MsgDateTime = dateTime,
-                    MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
+                    MsgAlignment = alignement
                 };
                 OnMessageReceived?.Invoke(message);
             });
 
             await _hubConnection.StartAsync();
+
+            _hubConnection.On<string, string>("UserJoined", (user, text) =>
+            {
+                var message = new Message
+                {
+                    MsgText = $"{user} : {text}",
+                    MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
+                };
+                OnMessageReceived?.Invoke(message);
+            });
         }
 
         public async Task JoinChannelAsync(int channelId)
