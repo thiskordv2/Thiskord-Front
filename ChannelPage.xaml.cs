@@ -81,9 +81,6 @@ namespace Thiskord_Front
 
         private void TextBox_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
         {
-            if (e.Key != VirtualKey.Enter)
-                return;
-
             if (e.Key == VirtualKey.Enter)
             {
                 OnSendButton_Click(sender, e);
