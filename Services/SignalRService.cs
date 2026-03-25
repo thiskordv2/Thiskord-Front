@@ -44,37 +44,23 @@ namespace Thiskord_Front.Services
                
                 foreach (var m in messages)
                 {
-                    var alignement = m.User == _sessionService.CurrentUser
-                    ? Microsoft.UI.Xaml.HorizontalAlignment.Right
-                    : Microsoft.UI.Xaml.HorizontalAlignment.Left;
                     OnMessageReceived?.Invoke(new Message
                     {
-                        MsgText = $"{m.User} : {m.Text}",
+                        MsgAuthor = m.User,
+                        MsgText = $"{m.Text}",
                         MsgDateTime = m.DateTime,
-                        MsgAlignment = alignement
+                        MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
                     });
                 }
             });
 
             _hubConnection.On<string, string, string>("ReceiveMessage", (user, text, dateTime) =>
-            {
-                var alignement = user == _sessionService.CurrentUser
-                    ? Microsoft.UI.Xaml.HorizontalAlignment.Right
-                    : Microsoft.UI.Xaml.HorizontalAlignment.Left; 
+            { 
                 var message = new Message
                 {
-                    MsgText = $"{user} : {text}",
+                    MsgAuthor = user,
+                    MsgText = $"{text}",
                     MsgDateTime = dateTime,
-                    MsgAlignment = alignement
-                };
-                OnMessageReceived?.Invoke(message);
-            });
-
-            _hubConnection.On<string, string>("UserJoined", (user, text) =>
-            {
-                var message = new Message
-                {
-                    MsgText = $"{user} : {text}",
                     MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
                 };
                 OnMessageReceived?.Invoke(message);
