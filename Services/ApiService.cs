@@ -12,11 +12,11 @@ namespace Thiskord_Front.Services
     public class ApiService
     {
         private static readonly HttpClient client = new HttpClient();
-        
-        private bool loaded = false; 
+        private readonly SessionService _sessionService;
 
         public ApiService()
         {
+            _sessionService = SessionService.Instance;
             if (client.BaseAddress == null)
             {
                 client.BaseAddress = new Uri("http://localhost:8080/api/");
@@ -25,8 +25,11 @@ namespace Thiskord_Front.Services
             }
         }
 
-        public async Task<string> CallApiAsync(string route, string method = "GET", string? jsonRequest = null)
+        public async Task<string> CallApiAsync(string route, string method, string? jsonRequest = null)
         {
+            if (_sessionService.Token != null) {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _sessionService.Token);
+            }
             try
             {
                 HttpResponseMessage? response = null;

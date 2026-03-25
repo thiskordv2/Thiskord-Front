@@ -30,9 +30,7 @@ namespace Thiskord_Front.ViewModels
 
         public bool IsNotLoading => !IsLoading;
 
-        // Succès → la Vue navigue vers Navigateur
         public event Action? OnLoginSuccess;
-        // Échec → la Vue affiche le message d'erreur
         public event Action<string>? OnLoginFailed;
 
         public LoginViewModel()
@@ -55,10 +53,8 @@ namespace Thiskord_Front.ViewModels
                 AuthRequest requestPayload = new AuthRequest(Username,  Password);
                 string jsonRequest = JsonSerializer.Serialize(requestPayload, new JsonSerializerOptions { WriteIndented = true });
                 
-                // 3. Appel simulé au service
                 AuthenticatedUser response = await _authService.login(jsonRequest);
 
-                // 4. Vérification de la réponse et actions appropriées
                 if (!string.IsNullOrEmpty(response.token))
                 {
                     _sessionService.Login(response.user.userName, response.token);

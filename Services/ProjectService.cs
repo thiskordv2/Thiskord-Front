@@ -23,9 +23,6 @@ namespace Thiskord_Front.Services
         {
             loaded = false;
             string jsonResult = await apiService.CallApiAsync("project/all", "GET");
-
-            System.Diagnostics.Debug.WriteLine("API payload: " + (jsonResult ?? "null"));
-
             if (!string.IsNullOrEmpty(jsonResult))
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -50,7 +47,6 @@ namespace Thiskord_Front.Services
         public async Task<List<Channel>> GetChannelsForProject(int projectId)
         {
             string jsonResult = await apiService.CallApiAsync($"channel/project/{projectId}", "GET");
-            System.Diagnostics.Debug.WriteLine("API payload for channels: " + (jsonResult ?? "null"));
             if (!string.IsNullOrEmpty(jsonResult))
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };

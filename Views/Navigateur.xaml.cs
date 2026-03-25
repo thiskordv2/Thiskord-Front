@@ -18,7 +18,7 @@ namespace Thiskord_Front.Views
         private readonly ProjectService _projectService = new ProjectService();
         private readonly ChannelService _channelService = new ChannelService();
         private bool _serverMenuInitialized;
-        private Channel? _contextMenuChannel;
+        private Channel? _contextMessageMenu;
 
         public ObservableCollection<Channel> Channels { get; set; } = new ObservableCollection<Channel>();
 
@@ -62,35 +62,6 @@ namespace Thiskord_Front.Views
             }
         }
 
-     
-        private async void ServerMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuFlyoutItem item && item.Tag is Project project)
-            {
-                System.Diagnostics.Debug.WriteLine($"Projet cliqué: {project.name} (ID: {project.id})");
-                
-                Channels.Clear();
-                
-                List<Channel> channels = await _projectService.GetChannelsForProject(project.id.Value);
-                
-                System.Diagnostics.Debug.WriteLine($"Channels reçus: {channels.Count}");
-                
-                foreach (var channel in channels)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Ajout channel: {channel.Name}");
-                    Channels.Add(channel);
-                }
-                
-                // Rouvrir le menu après le chargement
-                if (!ServerMenuFlyout.IsOpen)
-                {
-                    var target = ServerMenuFlyout.Target as FrameworkElement;
-                    if (target is not null)
-                        ServerMenuFlyout.ShowAt(target);
-                }
-            }
-        }
-
         private async void OnOpenProject_Click(object sender, RoutedEventArgs e)
         {
             Console.WriteLine(sender);
@@ -100,15 +71,11 @@ namespace Thiskord_Front.Views
                 {
                     openedProjectTitle.Content = project.name ?? "erreur d'affichage";
                     Channels.Clear();
-                    System.Diagnostics.Debug.WriteLine(project.id);
 
                     List<Channel> channels = await _projectService.GetChannelsForProject(project.id.Value);
 
-                    System.Diagnostics.Debug.WriteLine($"Channels reçus: {channels.Count}");
-
                     foreach (var channel in channels)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Ajout channel: {channel.Name}");
                         Channels.Add(channel);
                     }
                 }
@@ -131,27 +98,27 @@ namespace Thiskord_Front.Views
                 flyout.Target is TextBlock tb &&
                 tb.DataContext is Channel channel)
             {
-                _contextMenuChannel = channel;
+                _contextMessageMenu = channel;
             }
         }
 
         private async void ChannelContextMenu_Click(object sender, RoutedEventArgs e)
         {
-            if (_contextMenuChannel is null || sender is not MenuFlyoutItem item)
+            if (_contextMessageMenu is null || sender is not MenuFlyoutItem item)
                 return;
 
             switch (item.Tag as string)
             {
                 case "edit":
-                    await EditChannelAsync(_contextMenuChannel);
+                    await EditChannelAsync(_contextMessageMenu);
                     break;
 
                 case "delete":
-                    await DeleteChannelAsync(_contextMenuChannel);
+                    await DeleteChannelAsync(_contextMessageMenu);
                     break;
             }
 
-            _contextMenuChannel = null;
+            _contextMessageMenu = null;
         }
 
         private async Task EditChannelAsync(Channel channel)

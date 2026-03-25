@@ -17,6 +17,7 @@ namespace Thiskord_Front.Services
         private int? _currentChannelId;
 
         public event Action<Message>? OnMessageReceived;
+        public event Action<int>? OnMessageDeleted;
         public readonly SessionService _sessionService;
 
         private ChatService()
@@ -46,6 +47,7 @@ namespace Thiskord_Front.Services
                 {
                     OnMessageReceived?.Invoke(new Message
                     {
+                        Id = m.Id,
                         MsgAuthor = m.User,
                         MsgText = $"{m.Text}",
                         MsgDateTime = m.DateTime,
@@ -64,6 +66,11 @@ namespace Thiskord_Front.Services
                     MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
                 };
                 OnMessageReceived?.Invoke(message);
+            });
+
+            _hubConnection.On<int>("DeleteMessage", (messageId) =>
+            {
+                OnMessageDeleted?.Invoke(messageId);
             });
 
             await _hubConnection.StartAsync();
@@ -99,6 +106,12 @@ namespace Thiskord_Front.Services
         {
             if (_hubConnection is not null)
                 await _hubConnection.StopAsync();
+        }
+
+        public async Task DeleteMessage(int messageId)
+        {
+            if (!IsConnected || !_currentChannelId.HasValue) return;
+            await _hubConnection!.InvokeAsync("DeleteMessage", _currentChannelId.Value, messageId);
         }
     }
 }
