@@ -13,6 +13,9 @@ namespace Thiskord_Front.Models.Project
         [JsonPropertyName("projectId")]
         public int? ProjectId { get; set; }
 
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
+
         public string DisplayName => $"# {Name}";
     }
 }
