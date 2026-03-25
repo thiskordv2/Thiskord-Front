@@ -9,7 +9,7 @@ using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
 using Windows.System;
 
-namespace Thiskord_Front
+namespace Thiskord_Front.Views
 {
     public sealed partial class ChannelPage : Page
     {

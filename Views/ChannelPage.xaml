@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="Thiskord_Front.ChannelPage"
+    x:Class="Thiskord_Front.Views.ChannelPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Thiskord_Front"
+    xmlns:local="using:Thiskord_Front.Views"
     xmlns:models="using:Thiskord_Front.Models.Project"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -64,5 +64,4 @@
                 Click="OnSendButton_Click" />
         </Grid>
     </Grid>
-
 </Page>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="Thiskord_Front.Login"
+    x:Class="Thiskord_Front.Views.Login"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Thiskord_Front"
+    xmlns:local="using:Thiskord_Front.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -16,10 +16,11 @@
         <TextBlock Text="Connexion"
              FontFamily="Arial"
              FontSize="24" 
-             FontStyle="Italic" 
              TextWrapping="WrapWholeWords"
              CharacterSpacing="20" 
-            HorizontalAlignment="Center"
+             HorizontalAlignment="Center"
+             Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+             Style="{StaticResource TitleTextBlockStyle}"
         />
 
         <TextBox Width="250" Margin="0,0,8,0" Height="60" Header="Nom d'utilisateur" PlaceholderText="Username" 
@@ -36,6 +37,12 @@
             AutomationProperties.Name="Sample password box" IsEnabled="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"
             PasswordChanged="PasswordBox_PasswordChanged"
         />
+        
+        <TextBlock x:Name="LoginErrorText"
+           Foreground="Red"
+           FontSize="12"
+           HorizontalAlignment="Center"
+           Visibility="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"/>
 
         <Button Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.LoginCommand}" 
            IsEnabled="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"

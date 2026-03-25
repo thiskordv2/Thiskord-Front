@@ -30,9 +30,10 @@ namespace Thiskord_Front.ViewModels
 
         public bool IsNotLoading => !IsLoading;
 
-        // Événement pour demander à la Vue d'afficher la Popup
-        // (Le VM ne doit pas manipuler l'UI directement)
-        public event Action<string>? OnSimulationPopupRequested;
+        // Succès → la Vue navigue vers Navigateur
+        public event Action? OnLoginSuccess;
+        // Échec → la Vue affiche le message d'erreur
+        public event Action<string>? OnLoginFailed;
 
         public LoginViewModel()
         {
@@ -47,6 +48,7 @@ namespace Thiskord_Front.ViewModels
                 return;
 
             IsLoading = true;
+
             try
             {
 
@@ -54,18 +56,22 @@ namespace Thiskord_Front.ViewModels
                 string jsonRequest = JsonSerializer.Serialize(requestPayload, new JsonSerializerOptions { WriteIndented = true });
                 
                 // 3. Appel simulé au service
-                var response = await _authService.login(jsonRequest);
+                AuthenticatedUser response = await _authService.login(jsonRequest);
 
-                // 4. Préparation de la réponse au format JSON
-                string jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
-                string user = response.user.userName;
-                string token = response.token;
-                _sessionService.Login(user, token);
-                // 5. Combinaison de la requête et de la réponse pour affichage
-                string fullInfo = $"=== REQUÊTE ENVOYÉE ===\n{jsonRequest}\n\n=== RÉPONSE REÇUE ===\n{jsonResponse}";
-
-                // 6. Déclencher l'événement pour afficher la popup dans la Vue
-                OnSimulationPopupRequested?.Invoke(fullInfo);
+                // 4. Vérification de la réponse et actions appropriées
+                if (!string.IsNullOrEmpty(response.token))
+                {
+                    _sessionService.Login(response.user.userName, response.token);
+                    OnLoginSuccess?.Invoke();
+                }
+                else
+                {
+                    OnLoginFailed?.Invoke("Identifiants incorrects.");
+                }
+            }
+            catch (Exception ex)
+            {
+                OnLoginFailed?.Invoke($"Erreur de connexion : {ex.Message}");
             }
             finally
             {

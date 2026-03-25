@@ -13,7 +13,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Login.xaml" />
+    <None Remove="Views\Login.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,15 +46,15 @@
     <PackageReference Include="System.Text.Json" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="ChannelPage.xaml">
+    <Page Update="Views\ChannelPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Login.xaml">
+    <Page Update="Views\Login.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-	  <Page Update="Navigateur.xaml">
+	  <Page Update="Views\Navigateur.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 	  </Page>
   </ItemGroup>
