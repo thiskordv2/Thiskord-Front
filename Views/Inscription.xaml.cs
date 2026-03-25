@@ -13,7 +13,7 @@ using Thiskord_Front.Models;
 using Thiskord_Front.Services;
 using Windows.UI;
 
-namespace Thiskord_Front.Pages
+namespace Thiskord_Front.Views
 {
     public sealed partial class InscriptionPage : Page
     {

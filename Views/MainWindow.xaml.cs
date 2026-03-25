@@ -8,7 +8,7 @@ using Windows.Graphics;
 using Windows.UI;
 using WinRT;
 
-namespace Thiskord_Front
+namespace Thiskord_Front.Views
 {
     public sealed partial class MainWindow : Window
     {
