@@ -63,6 +63,15 @@
                 ProfilePicture="https://learn.microsoft.com/windows/uwp/contacts-and-calendar/images/shoulder-tap-static-payload.png" 
                 Width="50" Height="50"
                 HorizontalAlignment="Center"/>
+                <StackPanel.ContextFlyout>
+                    <MenuFlyout Opening="ChannelContextMenu_Opening">
+                        <MenuFlyoutItem Tag="disconnect" Text="Se déconnecter" Command="{x:Bind ViewModel.LogoutCommand}" >
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xF3B1;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </StackPanel.ContextFlyout>
             </StackPanel>
         </Grid>
 

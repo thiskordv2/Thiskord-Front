@@ -8,12 +8,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
+using Thiskord_Front.ViewModels;
 
 namespace Thiskord_Front.Views
 {
     public sealed partial class Navigateur : Page
     {
         public static Frame NavigateurFrame { get; set; }
+
+        public NavigateurViewModel ViewModel { get; }
 
         private readonly ProjectService _projectService = new ProjectService();
         private readonly ChannelService _channelService = new ChannelService();
@@ -28,6 +31,12 @@ namespace Thiskord_Front.Views
             NavigateurFrame = InnerFrame;
             InnerFrame.Navigate(typeof(ns_choice));
             channelListing.ItemsSource = Channels;
+
+            ViewModel = new NavigateurViewModel();
+            ViewModel.OnLogoutSuccess += () =>
+            {
+                this.Frame.Navigate(typeof(Login));
+            };
         }
 
         private async void ServerMenuFlyout_Opening(object sender, object e)

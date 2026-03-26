@@ -25,16 +25,15 @@
                         <TextBlock VerticalAlignment="Center" Text="{x:Bind MsgDateTime}" FontSize="13" Opacity="0.75" Foreground="{ThemeResource SystemColorHighlightTextColor}"/>
                     </StackPanel>
                     <StackPanel Style="{StaticResource MsgBackgroundStyle}" Padding="7, 7, 15, 7">
-                        <TextBlock   Text="{x:Bind MsgText}" FontSize="20" Foreground="{ThemeResource SystemColorHighlightTextColor}" TextWrapping="Wrap" Padding="0, 0, 0, 0"/>
+                        <TextBlock Text="{x:Bind MsgText}" FontSize="20" Foreground="{ThemeResource SystemColorHighlightTextColor}" TextWrapping="Wrap" Padding="0, 0, 0, 0" RightTapped="Message_RightTapped">
+                            <TextBlock.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Tag="edit" Text="Modifier" Icon="Edit" Click="MessageContextMenu_Click"/>
+                                    <MenuFlyoutItem Tag="delete" Text="Supprimer" Icon="Delete" Click="MessageContextMenu_Click"/>
+                                </MenuFlyout>
+                            </TextBlock.ContextFlyout>
+                        </TextBlock>
                     </StackPanel>
-                    <TextBlock Text="{x:Bind MsgText}" FontSize="20" Foreground="{ThemeResource SystemColorHighlightTextColor}" TextWrapping="Wrap" Padding="0, 0, 0, 0" RightTapped="Message_RightTapped">
-                        <TextBlock.ContextFlyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Tag="edit" Text="Modifier" Icon="Edit" Click="MessageContextMenu_Click"/>
-                                <MenuFlyoutItem Tag="delete" Text="Supprimer" Icon="Delete" Click="MessageContextMenu_Click"/>
-                            </MenuFlyout>
-                        </TextBlock.ContextFlyout>
-                    </TextBlock>
                 </StackPanel>
             </Grid>
         </DataTemplate>
