@@ -26,9 +26,6 @@ namespace Thiskord_Front.Services
         {
             AuthenticatedUser? res;
             string jsonResult = await this.apiService.CallApiAsync("auth/auth", "POST", jsonRequest);
-            System.Diagnostics.Debug.WriteLine("API payload: " + (jsonResult ?? "null"));
-            System.Diagnostics.Debug.WriteLine(jsonResult);
-            System.Diagnostics.Debug.WriteLine("connard");
             if (!string.IsNullOrEmpty(jsonResult))
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -37,8 +34,6 @@ namespace Thiskord_Front.Services
             {
                 res = null;
             }
-            System.Diagnostics.Debug.Write(res);
-
             return res ?? new AuthenticatedUser();
            
         }
@@ -56,7 +51,6 @@ namespace Thiskord_Front.Services
             {
                 res = null;
             }
-            System.Diagnostics.Debug.Write(res);
             return res;
         }
     }
