@@ -27,6 +27,7 @@
         Text="{x:Bind ViewModel.Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
              IsEnabled="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"
             FontFamily="Arial"
+            PreviewKeyDown="TextBox_PreviewKeyDown"
             HorizontalAlignment="Center"
             VerticalAlignment="Center" 
         />
@@ -34,6 +35,7 @@
         <PasswordBox Header="Mot de passe" Name="passworBoxWithRevealmode" PlaceholderText="Password"
             Width="250" Margin="0,0,8,0" Height="60"
             PasswordRevealMode="Hidden" 
+            PreviewKeyDown="TextBox_PreviewKeyDown"
             AutomationProperties.Name="Sample password box" IsEnabled="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"
             PasswordChanged="PasswordBox_PasswordChanged"
         />

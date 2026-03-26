@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -28,6 +29,7 @@ public sealed partial class Login : Page
 
         ViewModel.OnLoginSuccess += () => this.Frame.Navigate(typeof(Navigateur));
         ViewModel.OnLoginFailed += (msg) => LoginErrorText.Text = msg;
+        
     }
 
     private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
@@ -39,5 +41,14 @@ public sealed partial class Login : Page
     private void RegisterButton_Click(object sender, RoutedEventArgs e)
     {
         this.Frame.Navigate(typeof(InscriptionPage));
+    }
+    
+    private void TextBox_PreviewKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter)
+        {
+            ViewModel.LoginCommand.Execute(null);
+            e.Handled = true;
+        }
     }
 }
