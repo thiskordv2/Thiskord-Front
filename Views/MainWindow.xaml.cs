@@ -47,8 +47,8 @@ namespace Thiskord_Front.Views
 
             _acrylicController = new DesktopAcrylicController
             {
-                TintColor         = Color.FromArgb(255, 32, 32, 32),
-                TintOpacity       = 0.75f,
+                TintColor         = Color.FromArgb(255, 30, 30, 30),
+                TintOpacity       = 0.50f,
                 LuminosityOpacity = 0.85f,
                 Kind              = DesktopAcrylicKind.Base
             };

@@ -12,13 +12,20 @@
     <Page.Resources>
         <DataTemplate x:Key="MessageViewTemplate" x:DataType="models:Message">
             <Grid Height="Auto" Margin="3">
-                <StackPanel MinHeight="75" MaxWidth="650" Padding="5, 0, 5, 5" 
-                            Background="{ThemeResource SystemColorHighlightColor}" 
+                <StackPanel MinHeight="75" MaxWidth="650" Padding="10, 0, 20, 5" 
+                            
                             CornerRadius="{StaticResource ControlCornerRadius}"
                             HorizontalAlignment="{x:Bind MsgAlignment}">
                     <StackPanel Orientation="Horizontal" Spacing="8" Padding="0, 10, 0, 4">
-                        <TextBlock Text="{x:Bind MsgAuthor}" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource SystemColorHighlightTextColor}"/>
-                        <TextBlock Text="{x:Bind MsgDateTime}" FontSize="13" Opacity="0.75" Foreground="{ThemeResource SystemColorHighlightTextColor}"/>
+                        <PersonPicture 
+                            ProfilePicture="https://learn.microsoft.com/windows/uwp/contacts-and-calendar/images/shoulder-tap-static-payload.png" 
+                            Width="30" Height="30"
+                            VerticalAlignment="Center"/>
+                        <TextBlock VerticalAlignment="Center" Text="{x:Bind MsgAuthor}" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource SystemColorHighlightTextColor}"/>
+                        <TextBlock VerticalAlignment="Center" Text="{x:Bind MsgDateTime}" FontSize="13" Opacity="0.75" Foreground="{ThemeResource SystemColorHighlightTextColor}"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource MsgBackgroundStyle}" Padding="7, 7, 15, 7">
+                        <TextBlock   Text="{x:Bind MsgText}" FontSize="20" Foreground="{ThemeResource SystemColorHighlightTextColor}" TextWrapping="Wrap" Padding="0, 0, 0, 0"/>
                     </StackPanel>
                     <TextBlock Text="{x:Bind MsgText}" FontSize="20" Foreground="{ThemeResource SystemColorHighlightTextColor}" TextWrapping="Wrap" Padding="0, 0, 0, 0" RightTapped="Message_RightTapped">
                         <TextBlock.ContextFlyout>

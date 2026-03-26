@@ -27,6 +27,13 @@
 
                 <Setter Property="Padding" Value="15"/>
             </Style>
+            <Style x:Key="MsgBackgroundStyle" TargetType="StackPanel">
+                <Setter Property="CornerRadius" Value="10"/>
+
+                <Setter Property="Background" Value="#15FFFFFF"/>
+
+                <Setter Property="Padding" Value="15"/>
+            </Style>            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

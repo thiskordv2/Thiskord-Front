@@ -115,7 +115,7 @@ namespace Thiskord_Front.Views
 
         private void Button_Connexion_Click(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(typeof(InscriptionPage));
+            this.Frame.Navigate(typeof(Login));
         }
     }
 }
