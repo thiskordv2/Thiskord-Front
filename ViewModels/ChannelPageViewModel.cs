@@ -1,10 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
@@ -13,21 +11,49 @@ namespace Thiskord_Front.ViewModels
 {
     public partial class ChannelPageViewModel : ObservableObject
     {
-        [ObservableProperty]
-        private ObservableCollection<Message> messages  = new ();
-
         private readonly ChatService _chatService = ChatService.Instance;
-        private readonly SessionService _sessionService;
-        private Message? _contextMessageMenu;
 
-        public ChannelPageViewModel()
+        [ObservableProperty]
+        private Message? _contextMessage;
+
+        [ObservableProperty]
+        private string messageInput = string.Empty ;
+        public ObservableCollection<Message> Messages { get; } = new();
+
+        public async Task InitializeAsync(Channel channel)
         {
-            _sessionService = SessionService.Instance;
+            Messages.Clear();
+
+            _chatService.OnMessageReceived += OnMessageReceived;
+            _chatService.OnMessageDeleted += OnMessageDeleted;
+
+            try
+            {
+                await _chatService.ConnectAsync();
+                await _chatService.JoinChannelAsync(channel.Id.Value);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Erreur connexion chat: " + ex.Message);
+            }
+        }
+
+        public async Task CleanupAsync()
+        {
+            _chatService.OnMessageDeleted -= OnMessageDeleted;
+            _chatService.OnMessageReceived -= OnMessageReceived;
+            await _chatService.LeaveCurrentChannelAsync();
         }
 
         [RelayCommand]
-        private async Task SendMessage(string message)
+        private void SetContextMessage(Message message) => ContextMessage = message;
+
+        private bool CanSend() => !string.IsNullOrWhiteSpace(MessageInput);
+        [RelayCommand(CanExecute = nameof(CanSend))]
+        private async Task SendMessage()
         {
+            var message = MessageInput.Trim();
+            MessageInput = string.Empty;
             try
             {
                 await _chatService.SendMessageAsync(message);
@@ -38,6 +64,43 @@ namespace Thiskord_Front.ViewModels
             }
         }
 
+        [RelayCommand]
+        private async Task DeleteMessage()
+        {
+            if (ContextMessage is null) return;
+            try
+            {
+                await _chatService.DeleteMessage(ContextMessage.Id);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Erreur suppression message: " + ex.Message);
+            }
+            finally
+            {
+                ContextMessage = null;
+            }
+        }
 
+        [RelayCommand]
+        private async Task EditMessage()
+        {
+            var message = MessageInput.Trim();
+        }
+
+        public event Action<Action>? OnDispatchRequired;
+
+        private void OnMessageReceived(Message message)
+            => OnDispatchRequired?.Invoke(() => Messages.Add(message));
+
+        private void OnMessageDeleted(int messageId)
+            => OnDispatchRequired?.Invoke(() =>
+            {
+                var msg = Messages.FirstOrDefault(m => m.Id == messageId);
+                if (msg is not null) Messages.Remove(msg);
+            });
+
+        partial void OnMessageInputChanged(string value)
+            => SendMessageCommand.NotifyCanExecuteChanged();
     }
 }
