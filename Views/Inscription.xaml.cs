@@ -76,7 +76,7 @@ namespace Thiskord_Front.Views
 
                 ShowMessage("Inscription réussie ! \nRedirection en cours", "good");
                 await Task.Delay(2000);
-                this.Content = new Login(); 
+                this.Frame.Navigate(typeof(Login));
             }
             catch (Exception ex)
             {
