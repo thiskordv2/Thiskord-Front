@@ -23,7 +23,7 @@ namespace Thiskord_Front.Views
 
             InitializeComponent();
             NavigateurFrame = InnerFrame;
-            InnerFrame.Navigate(typeof(ns_choice));
+            InnerFrame.Navigate(typeof(ProjectChoice));
 
             EditChannelFromXamlCommand = ViewModel.EditChannelCommand;
             DeleteChannelFromXamlCommand = ViewModel.DeleteChannelCommand;
