@@ -47,7 +47,7 @@ namespace Thiskord_Front.ViewModels
             if (project == null) return;
             SelectedProjectName = project.name ?? "Projet sans nom";
 
-            var channels = await _channelService.GetChannelsForProject(project.id ?? 0);
+            var channels = await _channelService.GetChannelsForProject(project.id);
             Channels.Clear();
             foreach (var c in channels) Channels.Add(c);
         }
@@ -56,7 +56,7 @@ namespace Thiskord_Front.ViewModels
         public async Task DeleteChannel(Channel channel)
         {
             if (channel?.Id == null) return;
-            if (await _channelService.DeleteChannel(channel.Id ?? 0)) Channels.Remove(channel);
+            if (await _channelService.DeleteChannel(channel.Id.Value)) Channels.Remove(channel);
         }
 
         [RelayCommand]

@@ -9,10 +9,10 @@ namespace Thiskord_Front.Models.Project
 {
     public class Message
     {
-        public int? Id { get; set; } 
-        public string? MsgText { get; set; }
-        public string? MsgDateTime { get; set; }
-        public string? MsgAuthor { get; set; }
+        public int Id { get; set; } 
+        public string MsgText { get; set; }
+        public string MsgDateTime { get; set; }
+        public string MsgAuthor { get; set; }
         public HorizontalAlignment MsgAlignment { get; set; }
     }
 }
