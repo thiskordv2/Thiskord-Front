@@ -11,7 +11,7 @@ using Thiskord_Front.Services;
 using Windows.Security.Cryptography.Core;
 using System.Diagnostics;
 using Thiskord_Back.Models.Account;
-
+    
 namespace Thiskord_Front.Services
 {
     public class AuthService
@@ -30,9 +30,9 @@ namespace Thiskord_Front.Services
                 res = null;
             }
             return res ?? new AuthenticatedUser();
-           
+       
         }
-        
+      
         public async Task<UserAccount?> register(string jsonRequest)
         {
             UserAccount? res;
