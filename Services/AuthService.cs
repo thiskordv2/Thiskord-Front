@@ -16,13 +16,8 @@ namespace Thiskord_Front.Services
 {
     public class AuthService
     {
-        private ApiService apiService;
-        public AuthService()
-        {
-             apiService = new ApiService();
-        }
-        // Simule un appel réseau
-        public async Task<AuthenticatedUser> login(string jsonRequest)
+        private ApiService apiService = new();
+        public async Task<AuthenticatedUser?> login(string jsonRequest)
         {
             AuthenticatedUser? res;
             string jsonResult = await this.apiService.CallApiAsync("auth/auth", "POST", jsonRequest);
@@ -38,7 +33,7 @@ namespace Thiskord_Front.Services
            
         }
         
-        public async Task<UserAccount> register(string jsonRequest)
+        public async Task<UserAccount?> register(string jsonRequest)
         {
             UserAccount? res;
             string jsonResult = await this.apiService.CallApiAsync("inscription/register", "POST", jsonRequest);

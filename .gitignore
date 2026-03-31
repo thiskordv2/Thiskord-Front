@@ -6,3 +6,5 @@ bin/
 .idea/
 **.idea/
 **.user
+/AppPackages/
+/publish/

@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Thiskord_Front.Views"
+    xmlns:models="using:Thiskord_Front.Models.Project"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -24,10 +25,10 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Center" Spacing="5">
-                <DropDownButton x:Name="openedProjectTitle" Grid.Row="0" Content="Mes serveurs" HorizontalAlignment="Center" Margin="0,10,0,0">
+                <DropDownButton Grid.Row="0" Content="{x:Bind ViewModel.SelectedProjectName, Mode=OneWay}" HorizontalAlignment="Center" Margin="0,10,0,0">
                 <DropDownButton.Flyout>
                     <MenuFlyout x:Name="ServerMenuFlyout" 
-                                Placement="Bottom" 
+                                Placement="Bottom"
                                 Opening="ServerMenuFlyout_Opening">
                         <MenuFlyoutItem Text="Chargement"/>
                     </MenuFlyout>
@@ -39,18 +40,23 @@
             <ListView
             Grid.Row="1"
             x:Name="channelListing"
+            ItemsSource="{x:Bind ViewModel.Channels, Mode=OneWay}"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Margin="0,10,0,10"
             SelectionMode="Single"
-            SelectionChanged="channelListing_SelectionChanged">
+            SelectionChanged="ChannelListing_SelectionChanged">
                 <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding DisplayName}" FontSize="12" HorizontalAlignment="Left" Foreground="#FFFFFFFF" Padding="10,5,0,5">
+                    <DataTemplate x:DataType="models:Channel">
+                        <TextBlock Text="{Binding DisplayName, Mode=OneWay}" FontSize="12" HorizontalAlignment="Left" Foreground="#FFFFFFFF" Padding="10,5,0,5">
                             <TextBlock.ContextFlyout>
-                                <MenuFlyout Opening="ChannelContextMenu_Opening">
-                                    <MenuFlyoutItem Tag="edit" Text="Modifier" Icon="Edit" Click="ChannelContextMenu_Click"/>
-                                    <MenuFlyoutItem Tag="delete" Text="Supprimer" Icon="Delete" Click="ChannelContextMenu_Click"/>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Tag="edit" Text="Modifier" Icon="Edit" 
+                                                    Command="{x:Bind local:Navigateur.EditChannelFromXamlCommand}"
+                                                    CommandParameter="{x:Bind}"/>
+                                    <MenuFlyoutItem Tag="delete" Text="Supprimer" Icon="Delete" 
+                                                    Command="{x:Bind local:Navigateur.DeleteChannelFromXamlCommand}"
+                                                    CommandParameter="{x:Bind}"/>
                                 </MenuFlyout>
                             </TextBlock.ContextFlyout>
                         </TextBlock>
@@ -64,7 +70,7 @@
                 Width="50" Height="50"
                 HorizontalAlignment="Center"/>
                 <StackPanel.ContextFlyout>
-                    <MenuFlyout Opening="ChannelContextMenu_Opening">
+                    <MenuFlyout>
                         <MenuFlyoutItem Tag="disconnect" Text="Se déconnecter" Command="{x:Bind ViewModel.LogoutCommand}" >
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xF3B1;" />

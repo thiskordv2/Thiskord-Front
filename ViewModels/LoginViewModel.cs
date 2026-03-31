@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Thiskord_Front.Services;
-using System.Net.Security;
+using System;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Thiskord_Front.Models;
+using Thiskord_Front.Services;
 
 namespace Thiskord_Front.ViewModels
 {
@@ -25,13 +21,16 @@ namespace Thiskord_Front.ViewModels
         private string password = string.Empty;
 
         [ObservableProperty]
+        private string errorMessage = string.Empty;
+
+        [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsNotLoading))]
         private bool isLoading;
 
         public bool IsNotLoading => !IsLoading;
 
         public event Action? OnLoginSuccess;
-        public event Action<string>? OnLoginFailed;
+        public event Action? OnNavigateToRegister;
 
         public LoginViewModel()
         {
@@ -43,9 +42,13 @@ namespace Thiskord_Front.ViewModels
         private async Task Login()
         {
             if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+            {
+                ErrorMessage = "Veuillez remplir tous les champs.";
                 return;
+            }
 
             IsLoading = true;
+            ErrorMessage = string.Empty;
 
             try
             {
@@ -62,17 +65,23 @@ namespace Thiskord_Front.ViewModels
                 }
                 else
                 {
-                    OnLoginFailed?.Invoke("Identifiants incorrects.");
+                    ErrorMessage = "Identifiants incorrects.";
                 }
             }
             catch (Exception ex)
             {
-                OnLoginFailed?.Invoke($"Erreur de connexion : {ex.Message}");
+                ErrorMessage = $"Erreur de connexion : {ex.Message}";
             }
             finally
             {
                 IsLoading = false;
             }
+        }
+
+        [RelayCommand]
+        private void Register()
+        {
+            OnNavigateToRegister?.Invoke();
         }
     }
 }

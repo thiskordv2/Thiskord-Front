@@ -1,5 +1,5 @@
 <Page
-    x:Class="Thiskord_Front.Views.ns_choice"
+    x:Class="Thiskord_Front.Views.ProjectChoice"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Thiskord_Front.Views"
@@ -24,13 +24,14 @@
                 HorizontalAlignment="Center"
                 FontFamily="Arial"
                 FontSize="24"
+                Command="{x:Bind ViewModel.CreateProjectBtnCommand}"
             />
 
             <Button Content="Rejoindre un projet" 
                 HorizontalAlignment="Center"   
                 FontFamily="Arial"
                 FontSize="24"
-                Click="Join_Server_Click"
+                Command="{x:Bind ViewModel.JoinProjectCommand}"
             />
         </StackPanel>
     </Grid>

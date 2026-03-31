@@ -5,16 +5,35 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Thiskord_Front.Models.Project;
+using Windows.Services.Maps;
 
 namespace Thiskord_Front.Services
 {
     public class ChannelService
     {
-        private readonly ApiService _apiService;
+        private readonly ApiService _apiService = new();
 
-        public ChannelService()
+        public async Task<List<Channel>> GetChannelsForProject(int projectId)
         {
-            _apiService = new ApiService();
+            string jsonResult = await _apiService.CallApiAsync($"channel/project/{projectId}", "GET");
+            if (!string.IsNullOrEmpty(jsonResult))
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                try
+                {
+                    var channels = JsonSerializer.Deserialize<List<Channel>>(jsonResult, options) ?? new List<Channel>();
+                    return channels;
+                }
+                catch (JsonException ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Erreur Désérialisation des channels: " + ex.Message);
+                    return new List<Channel>();
+                }
+            }
+            else
+            {
+                return new List<Channel>();
+            }
         }
 
         public async Task<bool> DeleteChannel(int channelId)

@@ -34,8 +34,7 @@ namespace Thiskord_Front.Services
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl("http://localhost:8080/chatHub", options =>
                 {
-                    options.AccessTokenProvider = () => Task.FromResult(_sessionService.Token);
-                    // options.Headers["username"] = _sessionService.CurrentUser;
+                    options.AccessTokenProvider = () => Task.FromResult<string?>(_sessionService.Token);
                 })
                 .WithAutomaticReconnect()
                 .Build();
