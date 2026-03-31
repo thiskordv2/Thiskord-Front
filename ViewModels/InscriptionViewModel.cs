@@ -12,6 +12,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Thiskord_Back.Models.Account;
+using Thiskord_Front.Models;
 using Thiskord_Front.Services;
 using Thiskord_Front.Views;
 
@@ -20,6 +21,7 @@ namespace Thiskord_Front.ViewModels
     public partial class InscriptionViewModel : ObservableObject
     {
         public AuthService authService = new();
+        public SessionService sessionService = SessionService.Instance;
 
         [ObservableProperty]
         public string name = string.Empty;
@@ -67,10 +69,30 @@ namespace Thiskord_Front.ViewModels
                     return;
                 }
 
-                ErrorMessage = "Inscription réussie ! \nRedirection en cours";
+                ErrorMessage = "Inscription réussie ! \nConnexion en cours";
                 ErrorMessageColor = new SolidColorBrush(Colors.Green);
                 await Task.Delay(2000);
-                OnRegisterSuccess?.Invoke();
+
+                try
+                {
+
+                    AuthRequest requestPayload = new AuthRequest(newUser.user_name, newUser.user_password);
+                    string newJsonRequest = JsonSerializer.Serialize(requestPayload, new JsonSerializerOptions { WriteIndented = true });
+
+                    AuthenticatedUser payload = await authService.login(newJsonRequest);
+
+                    if (!string.IsNullOrEmpty(payload.token))
+                    {
+                        sessionService.Login(payload.user.userName, payload.token);
+                        OnRegisterSuccess?.Invoke();
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Erreur de connexion : {ex.Message}, Veuillez vous connecter manuellement";
+                    return;
+                }
             }
             catch (Exception ex)
             {

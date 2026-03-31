@@ -18,7 +18,7 @@ namespace Thiskord_Front.Views
         {
             this.InitializeComponent();
             ViewModel = new InscriptionViewModel();
-            ViewModel.OnRegisterSuccess += () => this.Frame.Navigate(typeof(Login));
+            ViewModel.OnRegisterSuccess += () => this.Frame.Navigate(typeof(Navigateur));
             ViewModel.OnNavigateToLogin += () => this.Frame.Navigate(typeof(Login));
         }
 
