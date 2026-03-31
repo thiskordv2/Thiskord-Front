@@ -47,7 +47,7 @@ namespace Thiskord_Front.ViewModels
             if (project == null) return;
             SelectedProjectName = project.name ?? "Projet sans nom";
 
-            var channels = await _projectService.GetChannelsForProject(project.id ?? 0);
+            var channels = await _channelService.GetChannelsForProject(project.id ?? 0);
             Channels.Clear();
             foreach (var c in channels) Channels.Add(c);
         }

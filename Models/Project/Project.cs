@@ -24,10 +24,10 @@ namespace Thiskord_Front.Models.Project
         public class ProjectRequest
         {
             [JsonPropertyName("name")]
-            public string name { get; set; }
+            public string? name { get; set; }
 
             [JsonPropertyName("description")]
-            public string description { get; set; }
+            public string? description { get; set; }
         }
     }
 
