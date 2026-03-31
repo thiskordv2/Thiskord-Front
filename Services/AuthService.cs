@@ -1,52 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Thiskord_Front.Models;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
-using Thiskord_Front.Services;
-using Windows.Security.Cryptography.Core;
-using System.Diagnostics;
-using Thiskord_Back.Models.Account;
+﻿    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+    using Thiskord_Front.Models;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Text.Json;
+    using Thiskord_Front.Services;
+    using Windows.Security.Cryptography.Core;
+    using System.Diagnostics;
+    using Thiskord_Back.Models.Account;
 
-namespace Thiskord_Front.Services
-{
-    public class AuthService
+    namespace Thiskord_Front.Services
     {
-        private ApiService apiService = new();
-        public async Task<AuthenticatedUser?> login(string jsonRequest)
+        public class AuthService
         {
-            AuthenticatedUser? res;
-            string jsonResult = await this.apiService.CallApiAsync("auth/auth", "POST", jsonRequest);
-            if (!string.IsNullOrEmpty(jsonResult))
+            private ApiService apiService = new();
+            public async Task<AuthenticatedUser?> login(string jsonRequest)
             {
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                res = JsonSerializer.Deserialize<AuthenticatedUser>(jsonResult, options);
-            } else
-            {
-                res = null;
-            }
-            return res ?? new AuthenticatedUser();
+                AuthenticatedUser? res;
+                string jsonResult = await this.apiService.CallApiAsync("auth/auth", "POST", jsonRequest);
+                if (!string.IsNullOrEmpty(jsonResult))
+                {
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    res = JsonSerializer.Deserialize<AuthenticatedUser>(jsonResult, options);
+                } else
+                {
+                    res = null;
+                }
+                return res ?? new AuthenticatedUser();
            
-        }
+            }
         
-        public async Task<UserAccount?> register(string jsonRequest)
-        {
-            UserAccount? res;
-            string jsonResult = await this.apiService.CallApiAsync("inscription/register", "POST", jsonRequest);
-            if (!string.IsNullOrEmpty(jsonResult))
+            public async Task<UserAccount?> register(string jsonRequest)
             {
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                res = JsonSerializer.Deserialize<UserAccount>(jsonResult, options);
+                UserAccount? res;
+                string jsonResult = await this.apiService.CallApiAsync("inscription/register", "POST", jsonRequest);
+                if (!string.IsNullOrEmpty(jsonResult))
+                {
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    res = JsonSerializer.Deserialize<UserAccount>(jsonResult, options);
+                }
+                else
+                {
+                    res = null;
+                }
+                return res;
             }
-            else
-            {
-                res = null;
-            }
-            return res;
         }
     }
-}
