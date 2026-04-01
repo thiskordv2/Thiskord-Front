@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Thiskord_Front.Models;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
 
@@ -16,16 +17,19 @@ namespace Thiskord_Front.ViewModels
         private readonly SessionService _sessionService = SessionService.Instance;
         private readonly ProjectService _projectService = new();
         private readonly ChannelService _channelService = new();
+        private readonly UserService _userService = new();
 
         [ObservableProperty]
-        private string selectedProjectName = "Mes serveurs";
+        private string selectedProjectName = string.Empty;
         [ObservableProperty]
         private bool isLoadingProjects;
         public ObservableCollection<Channel> Channels { get; } = new();
         public ObservableCollection<Project> Projects { get; } = new();
+        public ObservableCollection<UserAccount> Users { get;  } = new();
 
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
+        public event Action? RequestEditProject;
 
         [RelayCommand]
         public async Task LoadProjects()
@@ -84,6 +88,23 @@ namespace Thiskord_Front.ViewModels
             }
 
             return success;
+        }
+        public async Task LoadUsers()
+        {
+            Users.Clear();
+            var result = await _userService.GetAllUsers();
+            System.Diagnostics.Debug.WriteLine($"Loaded {result.Count} users");
+            foreach (var user in result)
+            {
+                System.Diagnostics.Debug.WriteLine($"Adding user: {user.user_name}");
+                Users.Add(user);
+            }    
+        }
+
+        [RelayCommand]
+        private async Task ProjectSettings()
+        {
+            RequestEditProject?.Invoke();
         }
     }
 }

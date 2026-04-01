@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Thiskord_Front.Views"
     xmlns:models="using:Thiskord_Front.Models.Project"
+    xmlns:models2="using:Thiskord_Front.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -12,6 +13,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0" 
@@ -25,7 +27,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Center" Spacing="5">
-                <DropDownButton Grid.Row="0" Content="{x:Bind ViewModel.SelectedProjectName, Mode=OneWay}" HorizontalAlignment="Center" Margin="0,10,0,0">
+                <DropDownButton Grid.Row="0" Content="Mes serveurs"  HorizontalAlignment="Center" Margin="0,15,0,0">
                 <DropDownButton.Flyout>
                     <MenuFlyout x:Name="ServerMenuFlyout" 
                                 Placement="Bottom"
@@ -36,7 +38,7 @@
             </DropDownButton>
 
             </StackPanel>
-
+            
             <ListView
             Grid.Row="1"
             x:Name="channelListing"
@@ -81,8 +83,82 @@
             </StackPanel>
         </Grid>
 
+        <TextBlock Grid.Column="1" 
+                   Grid.Row="0"
+                   Text="{x:Bind ViewModel.SelectedProjectName, Mode=OneWay}"
+                   FontSize="24"
+                   Margin="10,10,0,10"/>
+        
         <Frame x:Name="InnerFrame" 
-           Grid.Column="1">
+           Grid.Column="1"
+           Grid.Row="1"
+           Grid.RowSpan="2">
+            <Frame.ContentTransitions>
+                <TransitionCollection>
+                    <NavigationThemeTransition  />
+                </TransitionCollection>
+            </Frame.ContentTransitions>
         </Frame>
+
+        <Grid Grid.Column="2" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock Grid.Row="0"
+                       Text="Membres"
+                       Style="{ThemeResource SubtitleTextBlockStyle}"
+                       Margin="12,12,12,8"/>
+
+            <ListView
+                Grid.Row="1"
+                x:Name="UsersListView"
+                SelectionMode="Single"
+                ItemsSource="{x:Bind ViewModel.Users, Mode=OneWay}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models2:UserAccount">
+                        <Grid Padding="0,4,0,4">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <PersonPicture
+                                Grid.Column="0"
+                                Grid.Row="0"
+                                Grid.RowSpan="2"
+                                ProfilePicture="https://learn.microsoft.com/windows/uwp/contacts-and-calendar/images/shoulder-tap-static-payload.png"
+                                Width="30" Height="30"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+                            <TextBlock
+                                Grid.Column="1"
+                                Text="{x:Bind user_name}"
+                                x:Phase="1"
+                                Style="{ThemeResource BaseTextBlockStyle}"
+                                Margin="12,6,0,0"/>
+                            <TextBlock
+                                Grid.Column="1"
+                                Grid.Row="1"
+                                Text="{x:Bind user_mail}"
+                                x:Phase="2"
+                                Style="{ThemeResource BodyTextBlockStyle}"
+                                Margin="12,0,0,6"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Button Command="{x:Bind ViewModel.ProjectSettingsCommand}" Grid.Row="2" HorizontalAlignment="Right" Margin="0, 0, 10, 10">
+                <FontIcon Glyph="&#xE713;" />
+            </Button>
+        </Grid>
+        
     </Grid>
 </Page>

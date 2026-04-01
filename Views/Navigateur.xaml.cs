@@ -30,6 +30,7 @@ namespace Thiskord_Front.Views
 
             ViewModel.OnLogoutSuccess += () => { this.Frame.Navigate(typeof(Login)); };
             ViewModel.RequestEditChannel += channel => _ = EditChannelAsync(channel);
+            ViewModel.LoadUsers();
         }
 
         private async void ServerMenuFlyout_Opening(object sender, object e)
