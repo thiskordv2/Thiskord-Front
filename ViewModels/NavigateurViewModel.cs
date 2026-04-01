@@ -31,6 +31,8 @@ namespace Thiskord_Front.ViewModels
         public event Action<Channel>? RequestEditChannel;
         public event Action? RequestEditProject;
 
+        public event Action? OnProjectCreate;
+
         [RelayCommand]
         public async Task LoadProjects()
         {
@@ -89,6 +91,32 @@ namespace Thiskord_Front.ViewModels
 
             return success;
         }
+
+        [RelayCommand]
+        public void JoinProject()
+        {
+            // Logique pour rejoindre un serveur
+        }
+
+        [RelayCommand]
+        private void CreateProjectBtn() { OnProjectCreate?.Invoke(); }
+
+        public async Task<bool> ConfirmCreateProject(string projectName, string projectDesc)
+        {
+            if (string.IsNullOrWhiteSpace(projectName))
+                return false;
+
+            bool success = await _projectService.CreateProject(projectName, projectDesc);
+            if (!success)
+                return false;
+
+            var projects = await _projectService.GetAllProjects();
+            Projects.Clear();
+            foreach (var p in projects)
+                Projects.Add(p);
+
+            return true;
+        }
         public async Task LoadUsers()
         {
             Users.Clear();
@@ -102,7 +130,7 @@ namespace Thiskord_Front.ViewModels
         }
 
         [RelayCommand]
-        private async Task ProjectSettings()
+        public async Task ProjectSettings()
         {
             RequestEditProject?.Invoke();
         }
