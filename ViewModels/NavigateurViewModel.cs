@@ -130,7 +130,7 @@ namespace Thiskord_Front.ViewModels
         }
 
         [RelayCommand]
-        private async Task ProjectSettings()
+        public async Task ProjectSettings()
         {
             RequestEditProject?.Invoke();
         }
