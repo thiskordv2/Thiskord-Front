@@ -60,7 +60,14 @@ namespace Thiskord_Front.ViewModels
 
                 if (!string.IsNullOrEmpty(response.token))
                 {
-                    _sessionService.Login(response.user.userName, response.token);
+                    var connectedUser = new UserAccount
+                    {
+                        user_name = response.user.userName,
+                        user_mail = response.user.userMail,
+                        user_picture = response.user.userPicture
+                    };
+
+                    _sessionService.Login(connectedUser, response.token);
                     OnLoginSuccess?.Invoke();
                 }
                 else
