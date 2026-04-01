@@ -101,6 +101,16 @@ namespace Thiskord_Front.ViewModels
         {
             if (projectName == null) return false;
             bool success = await _projectService.CreateProject(projectName, projectDesc);
+            if (success)
+            {
+                var newProject = new Project
+                {
+                    id = Projects.Any() ? Projects.Max(p => p.id) + 1 : 1,
+                    name = projectName,
+                    description = projectDesc
+                };
+                Projects.Add(newProject);
+            }
             return success;
         }
     }

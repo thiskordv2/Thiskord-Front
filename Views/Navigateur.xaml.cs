@@ -192,7 +192,7 @@ namespace Thiskord_Front.Views
             var dialog = new ContentDialog
             {
                 XamlRoot = this.XamlRoot,
-                Title = "Crée un projet",
+                Title = "Créer un projet",
                 Content = contentPanel,
                 PrimaryButtonText = "Créer",
                 SecondaryButtonText = "Annuler"
@@ -228,7 +228,7 @@ namespace Thiskord_Front.Views
                     {
                         XamlRoot = XamlRoot,
                         Title = "Erreur",
-                        Content = $"Impossible de crée le project « {newName} ».",
+                        Content = $"Impossible de créer le projet « {newName} ».",
                         PrimaryButtonText = "OK"
                     }.ShowAsync();
                 }
