@@ -55,10 +55,11 @@ namespace Thiskord_Front.Services
                 }
             });
 
-            _hubConnection.On<string, string, string>("ReceiveMessage", (user, text, dateTime) =>
+            _hubConnection.On<int, string, string, string>("ReceiveMessage", (id, user, text, dateTime) =>
             { 
                 var message = new Message
                 {
+                    Id=id,
                     MsgAuthor = user,
                     MsgText = $"{text}",
                     MsgDateTime = dateTime,
