@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Thiskord_Front.Models.Project
 {
     public class Project
     {
         [JsonPropertyName("id")]
-        public int? id { get; set; }
+        public int id { get; set; }
         [JsonPropertyName("name")]
-        public string? name { get; set; }
+        public string name { get; set; }
         [JsonPropertyName("description")]
-        public string? description { get; set; }
+        public string description { get; set; }
         public Project()
         {
         }

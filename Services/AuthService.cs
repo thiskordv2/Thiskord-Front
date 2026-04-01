@@ -10,25 +10,16 @@ using System.Text.Json;
 using Thiskord_Front.Services;
 using Windows.Security.Cryptography.Core;
 using System.Diagnostics;
-using Thiskord_Back.Models.Account;
-
+    
 namespace Thiskord_Front.Services
 {
     public class AuthService
     {
-        private ApiService apiService;
-        public AuthService()
-        {
-             apiService = new ApiService();
-        }
-        // Simule un appel réseau
-        public async Task<AuthenticatedUser> login(string jsonRequest)
+        private ApiService apiService = new();
+        public async Task<AuthenticatedUser?> login(string jsonRequest)
         {
             AuthenticatedUser? res;
             string jsonResult = await this.apiService.CallApiAsync("auth/auth", "POST", jsonRequest);
-            System.Diagnostics.Debug.WriteLine("API payload: " + (jsonResult ?? "null"));
-            System.Diagnostics.Debug.WriteLine(jsonResult);
-            System.Diagnostics.Debug.WriteLine("connard");
             if (!string.IsNullOrEmpty(jsonResult))
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -37,13 +28,11 @@ namespace Thiskord_Front.Services
             {
                 res = null;
             }
-            System.Diagnostics.Debug.Write(res);
-
             return res ?? new AuthenticatedUser();
-           
+       
         }
-        
-        public async Task<UserAccount> register(string jsonRequest)
+      
+        public async Task<UserAccount?> register(string jsonRequest)
         {
             UserAccount? res;
             string jsonResult = await this.apiService.CallApiAsync("inscription/register", "POST", jsonRequest);
@@ -56,7 +45,6 @@ namespace Thiskord_Front.Services
             {
                 res = null;
             }
-            System.Diagnostics.Debug.Write(res);
             return res;
         }
     }
