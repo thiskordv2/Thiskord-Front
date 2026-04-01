@@ -46,6 +46,11 @@
     <PackageReference Include="System.Text.Json" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Views\ProjectSettings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\ChannelPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -27,13 +28,36 @@ namespace Thiskord_Front.Views
 
             EditChannelFromXamlCommand = ViewModel.EditChannelCommand;
             DeleteChannelFromXamlCommand = ViewModel.DeleteChannelCommand;
-
-            ViewModel.OnLogoutSuccess += () => { this.Frame.Navigate(typeof(Login)); };
-            ViewModel.RequestEditChannel += channel => _ = EditChannelAsync(channel);
-
-            ViewModel.OnProjectCreate += async () => await CreateProject();
-            ViewModel.LoadUsers();
         }
+        // Evitez les fuites de mémoire :
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            ViewModel.RequestEditProject += NavigateToProjectSettings;
+            ViewModel.OnLogoutSuccess += OnLogoutSuccess;
+            ViewModel.RequestEditChannel += OnRequesEditChannel;
+
+            if (e.Parameter is Project project)
+            {
+                await ViewModel.SelectProjectCommand.ExecuteAsync(project);
+                await ViewModel.LoadUsers();
+                RightPanel.Visibility = Visibility.Visible;
+                if (ViewModel.SelectedChannel is not null) InnerFrame.Navigate(typeof(ChannelPage), ViewModel.SelectedChannel);
+            }
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            ViewModel.RequestEditProject -= NavigateToProjectSettings;
+            ViewModel.OnLogoutSuccess -= OnLogoutSuccess;
+            ViewModel.RequestEditChannel -= OnRequesEditChannel;
+        }
+
+        private void NavigateToProjectSettings(Project project) { this.Frame.Navigate(typeof(ProjectSettings), project); }
+        private void OnLogoutSuccess() { this.Frame.Navigate(typeof(Login)); }
+        private void OnRequesEditChannel(Channel channel) { _ = EditChannelAsync(channel); }
+
 
         private async void ServerMenuFlyout_Opening(object sender, object e)
         {
@@ -67,12 +91,16 @@ namespace Thiskord_Front.Views
         {
             if (sender is MenuFlyoutItem { Tag: Project project })
                 await ViewModel.SelectProjectCommand.ExecuteAsync(project);
+            ViewModel.LoadUsers();
+            ViewModel.SelectedChannel = null;
+            RightPanel.Visibility = Visibility.Visible;
         }
 
         private void ChannelListing_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (channelListing.SelectedItem is Channel selectedChannel)
             {
+                ViewModel.SelectedChannel = selectedChannel;
                 InnerFrame.Navigate(typeof(ChannelPage), selectedChannel);
                 channelListing.SelectedItem = null;
             }

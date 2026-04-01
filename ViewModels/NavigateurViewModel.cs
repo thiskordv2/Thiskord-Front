@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using Thiskord_Front.Models;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
+using Thiskord_Front.Views;
 
 namespace Thiskord_Front.ViewModels
 {
@@ -20,7 +22,11 @@ namespace Thiskord_Front.ViewModels
         private readonly UserService _userService = new();
 
         [ObservableProperty]
-        private string selectedProjectName = string.Empty;
+        private Project? selectedProject;
+
+        [ObservableProperty]
+        private Channel? selectedChannel;
+
         [ObservableProperty]
         private bool isLoadingProjects;
         public ObservableCollection<Channel> Channels { get; } = new();
@@ -29,7 +35,7 @@ namespace Thiskord_Front.ViewModels
 
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
-        public event Action? RequestEditProject;
+        public event Action<Project>? RequestEditProject;
 
         public event Action? OnProjectCreate;
 
@@ -51,10 +57,11 @@ namespace Thiskord_Front.ViewModels
         public async Task SelectProject(Project project)
         {
             if (project == null) return;
-            SelectedProjectName = project.name ?? "Projet sans nom";
+            SelectedProject = project;
 
             var channels = await _channelService.GetChannelsForProject(project.id);
             Channels.Clear();
+            if (channels == null) { selectedChannel = null; return; }
             foreach (var c in channels) Channels.Add(c);
         }
 
@@ -121,18 +128,22 @@ namespace Thiskord_Front.ViewModels
         {
             Users.Clear();
             var result = await _userService.GetAllUsers();
-            System.Diagnostics.Debug.WriteLine($"Loaded {result.Count} users");
             foreach (var user in result)
             {
-                System.Diagnostics.Debug.WriteLine($"Adding user: {user.user_name}");
                 Users.Add(user);
             }    
         }
 
         [RelayCommand]
-        public async Task ProjectSettings()
+        private void ProjectSettings()
         {
-            RequestEditProject?.Invoke();
+            Project project = SelectedProject;
+            RequestEditProject?.Invoke(project);
+        }
+
+        public void UpdateProject(Project project)
+        {
+            SelectedProject = project;
         }
     }
 }
