@@ -11,13 +11,13 @@
 
     <Grid x:Name="RootGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0" 
-          Width="125" 
+          Width="150" 
           HorizontalAlignment="Left" 
           VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
@@ -85,7 +85,7 @@
 
         <TextBlock Grid.Column="1" 
                    Grid.Row="0"
-                   Text="{x:Bind ViewModel.SelectedProjectName, Mode=OneWay}"
+                   Text="{x:Bind ViewModel.SelectedProject.name, Mode=OneWay}"
                    FontSize="24"
                    Margin="10,10,0,10"/>
         
@@ -100,7 +100,7 @@
             </Frame.ContentTransitions>
         </Frame>
 
-        <Grid Grid.Column="2" VerticalAlignment="Stretch">
+        <Grid Grid.Column="2" VerticalAlignment="Stretch" x:Name="RightPanel" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -155,7 +155,12 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Button Command="{x:Bind ViewModel.ProjectSettingsCommand}" Grid.Row="2" HorizontalAlignment="Right" Margin="0, 0, 10, 10">
+            <Button 
+                x:Name="ButtonEditProject"
+                Command="{x:Bind ViewModel.ProjectSettingsCommand}" 
+                Grid.Row="2" 
+                HorizontalAlignment="Right" 
+                Margin="0, 0, 10, 10" >
                 <FontIcon Glyph="&#xE713;" />
             </Button>
         </Grid>

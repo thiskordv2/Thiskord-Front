@@ -20,7 +20,6 @@ namespace Thiskord_Front.Services
                 try
                 {
                     var users = JsonSerializer.Deserialize<List<UserAccount>>(jsonResult, options) ?? new List<UserAccount>();
-                    System.Diagnostics.Debug.WriteLine("Utilisateurs récupérés: " + users.Count);
                     return users;
                 }
                 catch (JsonException ex)
