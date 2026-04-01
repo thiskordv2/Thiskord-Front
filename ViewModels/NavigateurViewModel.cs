@@ -93,19 +93,19 @@ namespace Thiskord_Front.ViewModels
 
         public async Task<bool> ConfirmCreateChannel(string channelName, string channelDesc)
         {
-            if (channelName == null) return false;
-            bool success = await _channelService.CreateChannel(channelName, channelDesc);
-            if (success)
-            {
-                var newChannel = new Channel
-                {
-                    Id = Channels.Any() ? Channels.Max(c => c.Id) + 1 : 1,
-                    Name = channelName,
-                    Description = channelDesc
-                };
-                Channels.Add(newChannel);
-            }
-            return success;
+            if (string.IsNullOrWhiteSpace(channelName) || _currentProjectId is null)
+                return false;
+
+            bool success = await _channelService.CreateChannel(channelName, channelDesc, _currentProjectId.Value);
+            if (!success)
+                return false;
+
+            var channels = await _channelService.GetChannelsForProject(_currentProjectId.Value);
+            Channels.Clear();
+            foreach (var c in channels)
+                Channels.Add(c);
+
+            return true;
         }
     }
 }

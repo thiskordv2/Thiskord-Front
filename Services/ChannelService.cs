@@ -59,12 +59,13 @@ namespace Thiskord_Front.Services
             string? result = await _apiService.CallApiAsync($"channel/{channelId}", "PUT", json);
             return result != null;
         }
-        public async Task<bool> CreateChannel(string name, string description)
+        public async Task<bool> CreateChannel(string name, string description, int projectId)
         {
             var payload = new
             {
                 name = name,
-                description = description
+                description = description,
+                projectId = projectId
             };
 
             string json = JsonSerializer.Serialize(payload);
