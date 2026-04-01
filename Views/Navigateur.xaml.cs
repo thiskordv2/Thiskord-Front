@@ -30,6 +30,7 @@ namespace Thiskord_Front.Views
 
             ViewModel.OnLogoutSuccess += () => { this.Frame.Navigate(typeof(Login)); };
             ViewModel.RequestEditChannel += channel => _ = EditChannelAsync(channel);
+            ViewModel.RequestCreateChannel += () => _ = CreateChannelAsync();
         }
 
         private async void ServerMenuFlyout_Opening(object sender, object e)
@@ -151,6 +152,76 @@ namespace Thiskord_Front.Views
                         XamlRoot = XamlRoot,
                         Title = "Erreur",
                         Content = $"Impossible de modifier le channel « {channel.Name} ».",
+                        PrimaryButtonText = "OK"
+                    }.ShowAsync();
+                }
+            }
+        }
+        private async Task CreateChannelAsync()
+        {
+            var nameTextBox = new TextBox
+            {
+                PlaceholderText = "Nom du channel",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var descriptionTextBox = new TextBox
+            {
+                PlaceholderText = "Description (optionnelle)",
+                AcceptsReturn = true,
+                Height = 100,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var contentPanel = new StackPanel
+            {
+                Spacing = 10,
+                Children =
+                {
+                    new TextBlock { Text = "Nom:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
+                    nameTextBox,
+                    new TextBlock { Text = "Description:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
+                    descriptionTextBox
+                }
+            };
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Créer un channel",
+                Content = contentPanel,
+                PrimaryButtonText = "Créer",
+                SecondaryButtonText = "Annuler"
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                string newName = nameTextBox.Text.Trim();
+                string newDescription = descriptionTextBox.Text?.Trim() ?? "";
+
+                if (string.IsNullOrWhiteSpace(newName))
+                {
+                    await new ContentDialog
+                    {
+                        XamlRoot = this.XamlRoot,
+                        Title = "Erreur",
+                        Content = "Le nom du channel ne peut pas être vide.",
+                        PrimaryButtonText = "OK"
+                    }.ShowAsync();
+                    return;
+                }
+
+                bool success = await ViewModel.ConfirmCreateChannel(newName, newDescription);
+
+                if (!success)
+                {
+                    await new ContentDialog
+                    {
+                        XamlRoot = this.XamlRoot,
+                        Title = "Erreur",
+                        Content = "Impossible de créer le channel.",
                         PrimaryButtonText = "OK"
                     }.ShowAsync();
                 }

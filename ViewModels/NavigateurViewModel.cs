@@ -16,16 +16,18 @@ namespace Thiskord_Front.ViewModels
         private readonly SessionService _sessionService = SessionService.Instance;
         private readonly ProjectService _projectService = new();
         private readonly ChannelService _channelService = new();
-
+       
         [ObservableProperty]
         private string selectedProjectName = "Mes serveurs";
         [ObservableProperty]
         private bool isLoadingProjects;
+        private int? _currentProjectId;
         public ObservableCollection<Channel> Channels { get; } = new();
         public ObservableCollection<Project> Projects { get; } = new();
 
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
+        public event Action? RequestCreateChannel;
 
         [RelayCommand]
         public async Task LoadProjects()
@@ -46,6 +48,7 @@ namespace Thiskord_Front.ViewModels
         {
             if (project == null) return;
             SelectedProjectName = project.name ?? "Projet sans nom";
+            _currentProjectId = project.id;
 
             var channels = await _channelService.GetChannelsForProject(project.id);
             Channels.Clear();
@@ -83,6 +86,25 @@ namespace Thiskord_Front.ViewModels
                     Channels[index] = channel; 
             }
 
+            return success;
+        }
+        [RelayCommand]
+        private void CreateChannel() => RequestCreateChannel?.Invoke();
+
+        public async Task<bool> ConfirmCreateChannel(string channelName, string channelDesc)
+        {
+            if (channelName == null) return false;
+            bool success = await _channelService.CreateChannel(channelName, channelDesc);
+            if (success)
+            {
+                var newChannel = new Channel
+                {
+                    Id = Channels.Any() ? Channels.Max(c => c.Id) + 1 : 1,
+                    Name = channelName,
+                    Description = channelDesc
+                };
+                Channels.Add(newChannel);
+            }
             return success;
         }
     }
