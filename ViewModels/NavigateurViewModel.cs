@@ -103,19 +103,19 @@ namespace Thiskord_Front.ViewModels
 
         public async Task<bool> ConfirmCreateProject(string projectName, string projectDesc)
         {
-            if (projectName == null) return false;
+            if (string.IsNullOrWhiteSpace(projectName))
+                return false;
+
             bool success = await _projectService.CreateProject(projectName, projectDesc);
-            if (success)
-            {
-                var newProject = new Project
-                {
-                    id = Projects.Any() ? Projects.Max(p => p.id) + 1 : 1,
-                    name = projectName,
-                    description = projectDesc
-                };
-                Projects.Add(newProject);
-            }
-            return success;
+            if (!success)
+                return false;
+
+            var projects = await _projectService.GetAllProjects();
+            Projects.Clear();
+            foreach (var p in projects)
+                Projects.Add(p);
+
+            return true;
         }
         public async Task LoadUsers()
         {
