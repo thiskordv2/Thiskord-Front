@@ -15,20 +15,20 @@ namespace Thiskord_Front.ViewModels
         public ObservableCollection<Project> Projects { get; } = new();
         public event Action? OnProjectCreate;
 
-        [RelayCommand]
-        public void JoinProject()
-        {
-            // Logique pour rejoindre un serveur
-        }
+        //[RelayCommand]
+        //public void JoinProject()
+        //{
+        //    // Logique pour rejoindre un serveur
+        //}
 
-        [RelayCommand]
-        private void CreateProjectBtn() { OnProjectCreate?.Invoke(); }
+        //[RelayCommand]
+        //private void CreateProjectBtn() { OnProjectCreate?.Invoke(); }
 
-        public async Task<bool> ConfirmCreateProject(string projectName, string projectDesc)
-        {
-            if (projectName == null) return false;
-            bool success = await _projectService.CreateProject(projectName, projectDesc);
-            return success;
-        }
+        //public async Task<bool> ConfirmCreateProject(string projectName, string projectDesc)
+        //{
+        //    if (projectName == null) return false;
+        //    bool success = await _projectService.CreateProject(projectName, projectDesc);
+        //    return success;
+        //}
     }
 }

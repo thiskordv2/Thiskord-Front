@@ -30,6 +30,8 @@ namespace Thiskord_Front.Views
 
             ViewModel.OnLogoutSuccess += () => { this.Frame.Navigate(typeof(Login)); };
             ViewModel.RequestEditChannel += channel => _ = EditChannelAsync(channel);
+
+            ViewModel.OnProjectCreate += async () => await CreateProject();
         }
 
         private async void ServerMenuFlyout_Opening(object sender, object e)
@@ -151,6 +153,82 @@ namespace Thiskord_Front.Views
                         XamlRoot = XamlRoot,
                         Title = "Erreur",
                         Content = $"Impossible de modifier le channel « {channel.Name} ».",
+                        PrimaryButtonText = "OK"
+                    }.ShowAsync();
+                }
+            }
+        }
+
+        private async Task CreateProject()
+        {
+            var newProjectName = new TextBox
+            {
+                Text = "",
+                PlaceholderText = "Nom du projet",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var newProjectDesc = new TextBox
+            {
+                Text = "",
+                PlaceholderText = "Description (optionnelle)",
+                AcceptsReturn = true,
+                Height = 100,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var contentPanel = new StackPanel
+            {
+                Spacing = 10,
+                Children =
+                {
+                    new TextBlock { Text = "Nom:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
+                    newProjectName,
+                    new TextBlock { Text = "Description:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
+                    newProjectDesc
+                }
+            };
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Crée un projet",
+                Content = contentPanel,
+                PrimaryButtonText = "Créer",
+                SecondaryButtonText = "Annuler"
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                string newName = newProjectName.Text.Trim();
+                string newDescription = newProjectDesc.Text?.Trim() ?? "";
+
+                if (string.IsNullOrWhiteSpace(newName))
+                {
+                    var errorDialog = new ContentDialog
+                    {
+                        XamlRoot = this.XamlRoot,
+                        Title = "Erreur",
+                        Content = "Le nom du projet ne peut pas être vide.",
+                        PrimaryButtonText = "OK"
+                    };
+                    await errorDialog.ShowAsync();
+                    return;
+                }
+
+                bool success = await ViewModel.ConfirmCreateProject(
+                    newName,
+                    newDescription);
+
+                if (!success)
+                {
+                    await new ContentDialog
+                    {
+                        XamlRoot = XamlRoot,
+                        Title = "Erreur",
+                        Content = $"Impossible de crée le project « {newName} ».",
                         PrimaryButtonText = "OK"
                     }.ShowAsync();
                 }

@@ -26,15 +26,14 @@
 
             <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Center" Spacing="5">
                 <DropDownButton Grid.Row="0" Content="{x:Bind ViewModel.SelectedProjectName, Mode=OneWay}" HorizontalAlignment="Center" Margin="0,10,0,0">
-                <DropDownButton.Flyout>
-                    <MenuFlyout x:Name="ServerMenuFlyout" 
-                                Placement="Bottom"
-                                Opening="ServerMenuFlyout_Opening">
-                        <MenuFlyoutItem Text="Chargement"/>
-                    </MenuFlyout>
-                </DropDownButton.Flyout>
-            </DropDownButton>
-
+                    <DropDownButton.Flyout>
+                        <MenuFlyout x:Name="ServerMenuFlyout" 
+                                    Placement="Bottom"
+                                    Opening="ServerMenuFlyout_Opening">
+                            <MenuFlyoutItem Text="Chargement"/>
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
             </StackPanel>
 
             <ListView
@@ -63,6 +62,19 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+
+            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center" Spacing="5">
+                <DropDownButton Grid.Row="0" HorizontalAlignment="Center" Margin="0,10,0,0">
+                    <DropDownButton.Flyout>
+                        <MenuFlyout x:Name="ActionServerMenuFlyout"
+                                    Placement="Bottom"
+                                    Opening="ServerMenuFlyout_Opening">
+                            <MenuFlyoutItem Text="Créer un projet" Command="{x:Bind ViewModel.CreateProjectBtnCommand}"/>
+                            <MenuFlyoutItem Text="Rejoindre un projet"/>
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+            </StackPanel>
 
             <StackPanel Grid.Row="2" Orientation="Vertical" Padding="0,0,0,10">
                 <PersonPicture 

@@ -27,6 +27,8 @@ namespace Thiskord_Front.ViewModels
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
 
+        public event Action? OnProjectCreate;
+
         [RelayCommand]
         public async Task LoadProjects()
         {
@@ -83,6 +85,22 @@ namespace Thiskord_Front.ViewModels
                     Channels[index] = channel; 
             }
 
+            return success;
+        }
+
+        [RelayCommand]
+        public void JoinProject()
+        {
+            // Logique pour rejoindre un serveur
+        }
+
+        [RelayCommand]
+        private void CreateProjectBtn() { OnProjectCreate?.Invoke(); }
+
+        public async Task<bool> ConfirmCreateProject(string projectName, string projectDesc)
+        {
+            if (projectName == null) return false;
+            bool success = await _projectService.CreateProject(projectName, projectDesc);
             return success;
         }
     }
