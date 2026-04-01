@@ -24,14 +24,12 @@
                 HorizontalAlignment="Center"
                 FontFamily="Arial"
                 FontSize="24"
-                Command="{x:Bind ViewModel.CreateProjectBtnCommand}"
             />
 
             <Button Content="Rejoindre un projet" 
                 HorizontalAlignment="Center"   
                 FontFamily="Arial"
                 FontSize="24"
-                Command="{x:Bind ViewModel.JoinProjectCommand}"
             />
         </StackPanel>
     </Grid>
