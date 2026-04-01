@@ -73,6 +73,16 @@
                 HorizontalAlignment="Center"/>
                 <StackPanel.ContextFlyout>
                     <MenuFlyout>
+                        <MenuFlyoutItem Text="Créer un projet" Command="{x:Bind ViewModel.CreateProjectBtnCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE710;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Rejoindre un projet">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8FD;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
                         <MenuFlyoutItem Tag="disconnect" Text="Se déconnecter" Command="{x:Bind ViewModel.LogoutCommand}" >
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xF3B1;" />
