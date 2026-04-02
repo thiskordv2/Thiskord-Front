@@ -83,6 +83,11 @@
                                 <FontIcon Glyph="&#xE8FD;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Paramètres" Command="{x:Bind ViewModel.UserSettingsCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE713;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
                         <MenuFlyoutItem Tag="disconnect" Text="Se déconnecter" Command="{x:Bind ViewModel.LogoutCommand}" >
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xF3B1;" />

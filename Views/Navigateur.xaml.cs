@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Thiskord_Front.Models;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.ViewModels;
 
@@ -30,6 +31,7 @@ namespace Thiskord_Front.Views
 
             ViewModel.OnLogoutSuccess += () => { this.Frame.Navigate(typeof(Login)); };
             ViewModel.RequestEditChannel += channel => _ = EditChannelAsync(channel);
+            ViewModel.RequestEditUser += () => _ = OpenUserSettingsAsync();
 
             ViewModel.OnProjectCreate += async () => await CreateProject();
             ViewModel.LoadUsers();
@@ -234,6 +236,42 @@ namespace Thiskord_Front.Views
                     }.ShowAsync();
                 }
             }
+        }
+
+        private async Task OpenUserSettingsAsync()
+        {
+            UserAccount? user = ViewModel.ConnectedUser;
+
+            var content = new StackPanel
+            {
+                Spacing = 12,
+                Children =
+                {
+                    new TextBlock
+                    {
+                        Text = "Mon profil",
+                        Style = (Style)Application.Current.Resources["SubtitleTextBlockStyle"]
+                    },
+                    new PersonPicture
+                    {
+                        Width = 64,
+                        Height = 64,
+                    },
+                    new TextBlock { Text = $"Nom : {user?.user_name ?? "Non défini"}" },
+                    new TextBlock { Text = $"Mail : {user?.user_mail ?? "Non défini"}" }
+                }
+            };
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = XamlRoot,
+                Title = "Paramètres utilisateur",
+                Content = content,
+                PrimaryButtonText = "Fermer",
+                DefaultButton = ContentDialogButton.Primary
+            };
+
+            await dialog.ShowAsync();
         }
     }
 }

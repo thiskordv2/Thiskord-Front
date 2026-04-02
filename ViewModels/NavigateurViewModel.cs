@@ -23,6 +23,8 @@ namespace Thiskord_Front.ViewModels
         private string selectedProjectName = string.Empty;
         [ObservableProperty]
         private bool isLoadingProjects;
+        [ObservableProperty]
+        private UserAccount? connectedUser;
         public ObservableCollection<Channel> Channels { get; } = new();
         public ObservableCollection<Project> Projects { get; } = new();
         public ObservableCollection<UserAccount> Users { get;  } = new();
@@ -30,6 +32,7 @@ namespace Thiskord_Front.ViewModels
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
         public event Action? RequestEditProject;
+        public event Action? RequestEditUser;
 
         public event Action? OnProjectCreate;
 
@@ -133,6 +136,13 @@ namespace Thiskord_Front.ViewModels
         public async Task ProjectSettings()
         {
             RequestEditProject?.Invoke();
+        }
+
+        [RelayCommand]
+        public async Task UserSettings()
+        {
+            connectedUser = _sessionService.CurrentUserAccount;
+            RequestEditUser?.Invoke();
         }
     }
 }
