@@ -58,7 +58,6 @@ namespace Thiskord_Front.Views
         private void OnLogoutSuccess() { this.Frame.Navigate(typeof(Login)); }
         private void OnRequesEditChannel(Channel channel) { _ = EditChannelAsync(channel); }
 
-
         private async void ServerMenuFlyout_Opening(object sender, object e)
         {
             await ViewModel.LoadProjectsCommand.ExecuteAsync(null);

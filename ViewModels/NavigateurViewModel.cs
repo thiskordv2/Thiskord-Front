@@ -58,7 +58,6 @@ namespace Thiskord_Front.ViewModels
         {
             if (project == null) return;
             SelectedProject = project;
-
             var channels = await _channelService.GetChannelsForProject(project.id);
             Channels.Clear();
             if (channels == null) { selectedChannel = null; return; }
