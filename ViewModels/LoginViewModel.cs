@@ -58,19 +58,12 @@ namespace Thiskord_Front.ViewModels
                 
                 AuthenticatedUser response = await _authService.login(jsonRequest);
 
-                if (!string.IsNullOrEmpty(response.token))
-                {
-                    _sessionService.Login(response.user.userName, response.token);
-                    OnLoginSuccess?.Invoke();
-                }
-                else
-                {
-                    ErrorMessage = "Identifiants incorrects.";
-                }
+                _sessionService.Login(response.user.userName, response.token);
+                OnLoginSuccess?.Invoke();
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Erreur de connexion : {ex.Message}";
+                ErrorMessage = $"Erreur lors de la connexion :\n{ex.Message}";
             }
             finally
             {

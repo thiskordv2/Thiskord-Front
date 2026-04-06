@@ -24,12 +24,11 @@ namespace Thiskord_Front.Services
             {
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 res = JsonSerializer.Deserialize<AuthenticatedUser>(jsonResult, options);
+                return res;
             } else
             {
-                res = null;
-            }
-            return res ?? new AuthenticatedUser();
-       
+                throw new Exception("Aucune réponse du serveur.");
+            }       
         }
       
         public async Task<UserAccount?> register(string jsonRequest)
