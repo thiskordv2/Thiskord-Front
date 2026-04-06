@@ -45,17 +45,17 @@ namespace Thiskord_Front.Services
             return !string.IsNullOrEmpty(jsonResult);
         }
 
-        public async Task<bool> EditProject(int projectId, string name, string description)
+        public async Task<bool> EditProject(Project project)
         {
-            var payload = new
-            {
-                name = name,
-                description = description
-            };
-
-            string json = JsonSerializer.Serialize(payload);
-            string? result = await apiService.CallApiAsync($"project/{projectId}", "PUT", json);
+            string json = JsonSerializer.Serialize(project);
+            string? result = await apiService.CallApiAsync($"project/{project.id}", "PUT", json);
             return result != null;
         }
-    }
+
+        public async Task<bool> DeleteProject(int projectId)
+        {
+            string? result = await apiService.CallApiAsync($"project/{projectId}", "DELETE");
+            return result != null;
+        }
+    }       
 }

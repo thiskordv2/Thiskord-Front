@@ -42,6 +42,7 @@
            Foreground="Red"
            FontSize="12"
            HorizontalAlignment="Center"
+           VerticalAlignment="Center"
            Visibility="{x:Bind ViewModel.IsNotLoading, Mode=OneWay}"/>
 
         <Button Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.LoginCommand}" 
