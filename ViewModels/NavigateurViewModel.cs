@@ -126,7 +126,7 @@ namespace Thiskord_Front.ViewModels
         public async Task LoadUsers()
         {
             Users.Clear();
-            var result = await _userService.GetAllUsers();
+            var result = await _userService.GetAllUsersForProject(SelectedProject.id);
             foreach (var user in result)
             {
                 Users.Add(user);
