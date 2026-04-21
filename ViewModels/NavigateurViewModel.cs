@@ -36,6 +36,7 @@ namespace Thiskord_Front.ViewModels
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
         public event Action<Project>? RequestEditProject;
+        public event Action? OnJoinProject;
 
         public event Action? OnProjectCreate;
 
@@ -101,7 +102,7 @@ namespace Thiskord_Front.ViewModels
         [RelayCommand]
         public void JoinProject()
         {
-            // Logique pour rejoindre un serveur
+            OnJoinProject?.Invoke();
         }
 
         [RelayCommand]
