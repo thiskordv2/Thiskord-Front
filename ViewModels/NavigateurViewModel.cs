@@ -25,6 +25,7 @@ namespace Thiskord_Front.ViewModels
         [ObservableProperty]
         private Project? selectedProject;
 
+        [ObservableProperty] private string joinMessage = null;
         [ObservableProperty]
         private Channel? selectedChannel;
 
@@ -105,6 +106,27 @@ namespace Thiskord_Front.ViewModels
         public void JoinProject()
         {
             OnJoinProject?.Invoke();
+        }
+
+        [RelayCommand]
+        public async Task JoinProjectBtn(string url)
+        {
+            try
+            {
+                var uri = new Uri(url);
+                string token = uri.Segments.Last();
+                string? result = await _projectService.JoinProject(token);
+                JoinMessage = result ?? "Erreur lors de la tentative de rejoindre le projet.";
+            }
+            catch (UriFormatException)
+            {
+                JoinMessage = "L'URL fournie est invalide.";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Erreur JoinProjectBtn: " + ex.Message);
+                JoinMessage = "Une erreur inattendue est survenue.";
+            }
         }
 
         [RelayCommand]

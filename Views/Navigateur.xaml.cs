@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.ViewModels;
+using Windows.ApplicationModel.Contacts;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace Thiskord_Front.Views
@@ -40,6 +41,7 @@ namespace Thiskord_Front.Views
             ViewModel.OnLogoutSuccess += OnLogoutSuccess;
             ViewModel.RequestEditChannel += OnRequestEditChannel;
             ViewModel.OnProjectCreate += CreateProjectTask;
+            ViewModel.OnJoinProject += JoinProjectTask;
 
             if (e.Parameter is Project project)
             {
@@ -58,6 +60,7 @@ namespace Thiskord_Front.Views
             ViewModel.RequestEditChannel -= OnRequestEditChannel;
             ViewModel.OnProjectCreate -= CreateProjectTask;
             ViewModel.OnInviteTokenReceived -= ShowInviteGenerationDialog;
+            ViewModel.OnJoinProject -= JoinProjectTask;
         }
 
         private void NavigateToProjectSettings(Project project) { this.Frame.Navigate(typeof(ProjectSettings), project); }
@@ -101,17 +104,31 @@ namespace Thiskord_Front.Views
                     return;
                 }
 
+                errorMessageBlock.Visibility = Visibility.Collapsed;
+
                 string expiresAt = expiresAtPicker.SelectedDate!.Value.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
                 generatedToken = await ViewModel.GenerateInvitationToken(expiresAt);
-                if (!string.IsNullOrEmpty(generatedToken))
+
+                if (string.IsNullOrEmpty(generatedToken))
+                {
+                    errorMessageBlock.Text = "Une erreur est survenue lors de la génération du lien d'invitation.";
+                    errorMessageBlock.Visibility = Visibility.Visible;
+                    return; 
+                }
+
+                bool isValidUrl = Uri.TryCreate(generatedToken, UriKind.Absolute, out Uri? uriResult)
+                                  && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+                if (isValidUrl)
                 {
                     dialog.Hide();
                 }
                 else
                 {
-                    errorMessageBlock.Text = "Une erreur est survenue lors de la génération du lien d'invitation.";
+                    errorMessageBlock.Text = generatedToken; 
                     errorMessageBlock.Visibility = Visibility.Visible;
+                    generatedToken = null;
                 }
 
             };  
@@ -121,8 +138,6 @@ namespace Thiskord_Front.Views
                 Spacing = 16,
                 Children = { generateText, expiresAtPicker, generateButton, errorMessageBlock }
             };
-
-
 
             dialog = new ContentDialog
             {
@@ -452,6 +467,50 @@ namespace Thiskord_Front.Views
                         Content = $"Impossible de créer le projet « {newName} ».",
                         PrimaryButtonText = "OK"
                     }.ShowAsync();
+                }
+            }
+        }
+
+        private async void JoinProjectTask()
+        {
+            await JoinProject();
+        }
+        private async Task JoinProject()
+        {
+            var title = new TextBlock
+            {
+                Text = "Entrez l'url reçu"
+            };
+
+            var urlBox = new TextBox
+            {
+                PlaceholderText = "https://api.emre-ak.fr/api/invite/examplelink",
+                AcceptsReturn = false,
+            };
+
+            var container = new StackPanel
+            {
+                Spacing = 10,
+                Children = { title, urlBox }
+            };
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Rejoindre un projet",
+                Content = container,
+                PrimaryButtonText = "Rejoindre",
+                SecondaryButtonText = "Annuler",
+            };
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                string url = urlBox.Text.Trim();
+
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    await ViewModel.JoinProjectBtn(url);
                 }
             }
         }

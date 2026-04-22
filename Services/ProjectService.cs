@@ -86,5 +86,11 @@ namespace Thiskord_Front.Services
             }
             return null;
         }
+
+        public async Task<string?> JoinProject(string token)
+        {
+            string? result = await apiService.CallApiAsync($"invite/{token}", "POST");
+            return result;
+        }
     }       
 }
