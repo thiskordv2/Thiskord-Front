@@ -242,7 +242,37 @@ namespace Thiskord_Front.Views
         {
             UserAccount? user = ViewModel.ConnectedUser;
 
-            var content = new StackPanel
+            string currentUserName = user?.user_name ?? "Non défini";
+            string currentUserMail = user?.user_mail ?? "Non défini";
+
+            const int nameRowIndex = 2;
+            const int mailRowIndex = 3;
+
+            var editProfileButton = new Button
+            {
+                Content = "Modifier mon profil",
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+
+            var cancelEditButton = new Button
+            {
+                Content = "Annuler",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Visibility = Visibility.Collapsed
+            };
+
+            var buttonsPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    editProfileButton,
+                    cancelEditButton
+                }
+            };
+
+            var profileContent = new StackPanel
             {
                 Spacing = 12,
                 Children =
@@ -257,16 +287,93 @@ namespace Thiskord_Front.Views
                         Width = 64,
                         Height = 64,
                     },
-                    new TextBlock { Text = $"Nom : {user?.user_name ?? "Non défini"}" },
-                    new TextBlock { Text = $"Mail : {user?.user_mail ?? "Non défini"}" }
+                    new TextBlock { Text = $"Nom : {currentUserName}" },
+                    new TextBlock { Text = $"Mail : {currentUserMail}" },
+                    buttonsPanel
                 }
+            };
+
+            var sideBar = new StackPanel
+            {
+                Width = 125,
+                Spacing = 4,
+                Children =
+                {
+                    new Button
+                    {
+                        Content = "Mon profil",
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        HorizontalContentAlignment = HorizontalAlignment.Left,
+                        Background = null,
+                        BorderThickness = new Thickness(0)
+                    },
+                    new Button
+                    {
+                        Content = "Sécurité",
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        HorizontalContentAlignment = HorizontalAlignment.Left,
+                        Background = null,
+                        BorderThickness = new Thickness(0)
+                    },
+                    new Button
+                    {
+                        Content = "Préférences",
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        HorizontalContentAlignment = HorizontalAlignment.Left,
+                        Background = null,
+                        BorderThickness = new Thickness(0)
+                    }
+                }
+            };
+
+            var layout = new Grid
+            {
+                ColumnSpacing = 24
+            };
+            layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(125) });
+            layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10, GridUnitType.Star) });
+
+            Grid.SetColumn(sideBar, 0);
+            Grid.SetColumn(profileContent, 1);
+
+            layout.Children.Add(sideBar);
+            layout.Children.Add(profileContent);
+
+            editProfileButton.Click += (_, _) =>
+            {
+                var nameInput = new TextBox
+                {
+                    Header = "Nom",
+                    Text = currentUserName
+                };
+
+                var mailInput = new TextBox
+                {
+                    Header = "Mail",
+                    Text = currentUserMail
+                };
+
+                profileContent.Children[nameRowIndex] = nameInput;
+                profileContent.Children[mailRowIndex] = mailInput;
+
+                editProfileButton.IsEnabled = false;
+                cancelEditButton.Visibility = Visibility.Visible;
+            };
+
+            cancelEditButton.Click += (_, _) =>
+            {
+                profileContent.Children[nameRowIndex] = new TextBlock { Text = $"Nom : {currentUserName}" };
+                profileContent.Children[mailRowIndex] = new TextBlock { Text = $"Mail : {currentUserMail}" };
+
+                editProfileButton.IsEnabled = true;
+                cancelEditButton.Visibility = Visibility.Collapsed;
             };
 
             var dialog = new ContentDialog
             {
                 XamlRoot = XamlRoot,
                 Title = "Paramètres utilisateur",
-                Content = content,
+                Content = layout,
                 PrimaryButtonText = "Fermer",
                 DefaultButton = ContentDialogButton.Primary
             };
