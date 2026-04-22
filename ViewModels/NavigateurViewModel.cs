@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Thiskord_Front.Models.GestionProjet;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
 
@@ -16,6 +17,7 @@ namespace Thiskord_Front.ViewModels
         private readonly SessionService _sessionService = SessionService.Instance;
         private readonly ProjectService _projectService = new();
         private readonly ChannelService _channelService = new();
+        private readonly SprintService _sprintService = new();
 
         [ObservableProperty]
         private string selectedProjectName = "Mes serveurs";
@@ -23,6 +25,8 @@ namespace Thiskord_Front.ViewModels
         private bool isLoadingProjects;
         public ObservableCollection<Channel> Channels { get; } = new();
         public ObservableCollection<Project> Projects { get; } = new();
+
+        public ObservableCollection<Sprint> Sprints { get; } = new();
 
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
@@ -48,8 +52,11 @@ namespace Thiskord_Front.ViewModels
             SelectedProjectName = project.name ?? "Projet sans nom";
 
             var channels = await _channelService.GetChannelsForProject(project.id);
+            var sprints = await _sprintService.GetSprint(project.id);
             Channels.Clear();
+            sprints.Clear();
             foreach (var c in channels) Channels.Add(c);
+            foreach (var s in sprints) Sprints.Add(s);
         }
 
         [RelayCommand]
