@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Thiskord_Front.Views"
     xmlns:models="using:Thiskord_Front.Models.Project"
+    xmlns:gestion="using:Thiskord_Front.Models.GestionProjet"
     xmlns:models2="using:Thiskord_Front.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -22,6 +23,7 @@
           VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -66,7 +68,20 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <StackPanel Grid.Row="2" Orientation="Vertical" Padding="0,0,0,10">
+            <ListView
+            Grid.Row="2"
+            x:Name="sprintListing"
+            ItemsSource="{x:Bind ViewModel.Sprints, Mode=OneWay}"
+            SelectionMode="Single"
+            SelectionChanged="SprintListing_SelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="gestion:Sprint">
+                        <TextBlock Text="{Binding DisplayName, Mode=OneWay}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <StackPanel Grid.Row="3" Orientation="Vertical" Padding="0,0,0,10">
                 <PersonPicture 
                 ProfilePicture="https://learn.microsoft.com/windows/uwp/contacts-and-calendar/images/shoulder-tap-static-payload.png" 
                 Width="50" Height="50"

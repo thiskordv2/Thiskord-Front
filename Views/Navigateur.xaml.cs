@@ -313,6 +313,11 @@ namespace Thiskord_Front.Views
             }
         }
 
+        private void SprintListing_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
         private async Task EditChannelAsync(Channel channel)
         {
             if (channel.Id is null) return;
