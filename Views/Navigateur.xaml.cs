@@ -101,7 +101,7 @@ namespace Thiskord_Front.Views
                     return;
                 }
 
-                string? expiresAt = expiresAtPicker.Date.ToString("yyyy-MM-dd");
+                string expiresAt = expiresAtPicker.SelectedDate!.Value.ToString("yyyy-MM-ddTHH:mm:ssZ");
 
                 generatedToken = await ViewModel.GenerateInvitationToken(expiresAt);
                 if (!string.IsNullOrEmpty(generatedToken))

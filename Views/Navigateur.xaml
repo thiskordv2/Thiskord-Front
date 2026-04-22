@@ -171,7 +171,6 @@
                 HorizontalAlignment="Right" 
                 Margin="0, 0, 10, 10">
                 <FontIcon Glyph="&#xE713;" />
-
                 <Button.Flyout>
                     <MenuFlyout Placement="Top">
                         <MenuFlyoutItem 
