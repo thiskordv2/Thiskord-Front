@@ -10,46 +10,31 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <!-- Couleurs charte graphique -->
-        <SolidColorBrush x:Key="AppBackgroundBrush" Color="#202020" Opacity="0.75"/>
-        <SolidColorBrush x:Key="PanelBrush" Color="#2A2A2A"/>
-        <SolidColorBrush x:Key="SidebarBrush" Color="#1A1A1A"/>
-        <SolidColorBrush x:Key="InputBackgroundBrush" Color="#333333"/>
-        <SolidColorBrush x:Key="BorderBrush" Color="#FFFFFF" Opacity="0.5"/>
-        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F7FCFE"/>
-        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#B8BFBF"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#4CAF82"/>
-        <SolidColorBrush x:Key="DangerBrush" Color="#C0392B"/>
-        <SolidColorBrush x:Key="DangerBorderBrush" Color="#E74C3C"/>
-
-        <!-- Style TextBlock label -->
         <Style x:Key="LabelStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="#B8BFBF"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="Margin" Value="0,0,0,6"/>
         </Style>
 
-        <!-- Style TextBox dark -->
         <Style x:Key="DarkTextBoxStyle" TargetType="TextBox">
             <Setter Property="Background" Value="#333333"/>
             <Setter Property="Foreground" Value="#F7FCFE"/>
             <Setter Property="BorderBrush" Value="#444444"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="Padding" Value="14,12"/>
             <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="15"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
         </Style>
 
-        <!-- Style bouton sidebar actif -->
         <Style x:Key="SidebarButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="#F7FCFE"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="Padding" Value="16,12"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="15"/>
             <Setter Property="CornerRadius" Value="4"/>
         </Style>
 
@@ -59,156 +44,146 @@
         </Style>
     </Page.Resources>
 
-    <!-- Fond global -->
-    <Grid Background="#1E1E1E">
+    <Grid Background="#1E1E1E" Padding="48">
 
-        <!-- Conteneur centré simulant le panel flottant de la maquette -->
-        <Grid
-            MaxWidth="860"
-            MaxHeight="500"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            CornerRadius="12">
+        <Grid.ColumnDefinitions>
+            <!-- Sidebar -->
+            <ColumnDefinition Width="260"/>
+            <!-- Contenu -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-            <Grid.ColumnDefinitions>
-                <!-- Sidebar gauche -->
-                <ColumnDefinition Width="200"/>
-                <!-- Contenu principal -->
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <!-- ══ SIDEBAR GAUCHE ══ -->
+        <Border
+            Grid.Column="0"
+            Background="#1A1A1A"
+            CornerRadius="12,0,0,12">
 
-            <!-- ══ SIDEBAR GAUCHE ══ -->
-            <Border
-                Grid.Column="0"
-                Background="#1A1A1A"
-                CornerRadius="12,0,0,12"
-                BorderBrush="#FFFFFF"
-                BorderThickness="0,0,0,0">
+            <StackPanel Padding="0,32,0,32">
 
-                <StackPanel Padding="0,24,0,24">
+                <TextBlock
+                    Text="PARAMÈTRES"
+                    Foreground="#888888"
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    CharacterSpacing="80"
+                    Margin="20,0,0,14"/>
 
-                    <!-- Titre section -->
-                    <TextBlock
-                        Text="PARAMÈTRES"
-                        Foreground="#888888"
-                        FontSize="11"
-                        FontWeight="SemiBold"
-                        CharacterSpacing="80"
-                        Margin="16,0,0,12"/>
+                <Button Style="{StaticResource SidebarButtonActiveStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE713;" FontSize="18" Foreground="#F7FCFE"/>
+                        <TextBlock Text="Général" Foreground="#F7FCFE" FontSize="15"/>
+                    </StackPanel>
+                </Button>
 
-                    <!-- Onglet actif : Général -->
-                    <Button Style="{StaticResource SidebarButtonActiveStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <FontIcon Glyph="&#xE713;" FontSize="16" Foreground="#F7FCFE"/>
-                            <TextBlock Text="Général" Foreground="#F7FCFE"/>
-                        </StackPanel>
-                    </Button>
+                <Rectangle Height="1" Fill="#333333" Margin="20,20"/>
 
-                    <!-- Séparateur -->
-                    <Rectangle Height="1" Fill="#333333" Margin="16,16"/>
+                <TextBlock
+                    Text="ZONE DE DANGER"
+                    Foreground="#888888"
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    CharacterSpacing="80"
+                    Margin="20,0,0,14"/>
 
-                    <!-- Zone danger -->
-                    <TextBlock
-                        Text="ZONE DE DANGER"
-                        Foreground="#888888"
-                        FontSize="11"
-                        FontWeight="SemiBold"
-                        CharacterSpacing="80"
-                        Margin="16,0,0,12"/>
+                <Button
+                    Style="{StaticResource SidebarButtonStyle}"
+                    Command="{x:Bind ViewModel.DeleteProjectCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE74D;" FontSize="18" Foreground="#E74C3C"/>
+                        <TextBlock Text="Supprimer le projet" Foreground="#E74C3C" FontSize="15"/>
+                    </StackPanel>
+                </Button>
+
+            </StackPanel>
+        </Border>
+
+        <!-- ══ CONTENU PRINCIPAL ══ -->
+        <Border
+            Grid.Column="1"
+            Background="#242424"
+            CornerRadius="0,12,12,0">
+
+            <Grid Padding="48,40,48,40">
+                <Grid.RowDefinitions>
+                    <!-- Titre -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Spacer -->
+                    <RowDefinition Height="36"/>
+                    <!-- Nom du projet -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Spacer -->
+                    <RowDefinition Height="24"/>
+                    <!-- Description -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Push boutons vers le bas -->
+                    <RowDefinition Height="*"/>
+                    <!-- Boutons -->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Titre -->
+                <TextBlock
+                    Grid.Row="0"
+                    Text="{x:Bind ViewModel.EditTitle, Mode=OneWay}"
+                    Foreground="#F7FCFE"
+                    FontSize="26"
+                    FontWeight="SemiBold"/>
+
+                <!-- Nom du projet -->
+                <StackPanel Grid.Row="2" Spacing="8">
+                    <TextBlock Text="Nom du projet" Style="{StaticResource LabelStyle}"/>
+                    <TextBox
+                        Style="{StaticResource DarkTextBoxStyle}"
+                        Text="{x:Bind ViewModel.ProjectName, Mode=TwoWay}"
+                        PlaceholderText="Nom du projet"/>
+                </StackPanel>
+
+                <!-- Description -->
+                <StackPanel Grid.Row="4" Spacing="8">
+                    <TextBlock Text="Description" Style="{StaticResource LabelStyle}"/>
+                    <TextBox
+                        Style="{StaticResource DarkTextBoxStyle}"
+                        Text="{x:Bind ViewModel.ProjectDescription, Mode=TwoWay}"
+                        PlaceholderText="Description du projet"
+                        AcceptsReturn="True"
+                        TextWrapping="Wrap"
+                        Height="180"/>
+                </StackPanel>
+
+                <!-- Boutons -->
+                <StackPanel
+                    Grid.Row="6"
+                    Orientation="Horizontal"
+                    Spacing="14"
+                    HorizontalAlignment="Right">
 
                     <Button
-                        Style="{StaticResource SidebarButtonStyle}"
-                        Command="{x:Bind ViewModel.DeleteProjectCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <FontIcon Glyph="&#xE74D;" FontSize="16" Foreground="#E74C3C"/>
-                            <TextBlock Text="Supprimer le projet" Foreground="#E74C3C"/>
-                        </StackPanel>
-                    </Button>
-
-                </StackPanel>
-            </Border>
-
-            <!-- ══ CONTENU PRINCIPAL ══ -->
-            <Border
-                Grid.Column="1"
-                Background="#242424"
-                CornerRadius="0,12,12,0">
-
-                <Grid Padding="36,32,36,32">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="24"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="16"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Titre de la page -->
-                    <TextBlock
-                        Grid.Row="0"
-                        Text="{x:Bind ViewModel.EditTitle, Mode=OneWay}"
+                        Content="Annuler"
+                        Command="{x:Bind ViewModel.CancelEditCommand}"
+                        Background="#333333"
                         Foreground="#F7FCFE"
-                        FontSize="22"
+                        BorderBrush="#555555"
+                        BorderThickness="1"
+                        CornerRadius="20"
+                        Padding="24,10"
+                        FontSize="14"/>
+
+                    <Button
+                        Content="Enregistrer les modifications"
+                        Command="{x:Bind ViewModel.SaveProjectCommand}"
+                        Background="#4CAF82"
+                        Foreground="#FFFFFF"
+                        BorderThickness="0"
+                        CornerRadius="20"
+                        Padding="24,10"
+                        FontSize="14"
                         FontWeight="SemiBold"/>
 
-                    <!-- Champ : Nom du projet -->
-                    <StackPanel Grid.Row="2" Spacing="6">
-                        <TextBlock Text="Nom du projet" Style="{StaticResource LabelStyle}"/>
-                        <TextBox
-                            Style="{StaticResource DarkTextBoxStyle}"
-                            Text="{x:Bind ViewModel.ProjectName, Mode=TwoWay}"
-                            PlaceholderText="Nom du projet"/>
-                    </StackPanel>
+                </StackPanel>
 
-                    <!-- Champ : Description -->
-                    <StackPanel Grid.Row="4" Spacing="6">
-                        <TextBlock Text="Description" Style="{StaticResource LabelStyle}"/>
-                        <TextBox
-                            Style="{StaticResource DarkTextBoxStyle}"
-                            Text="{x:Bind ViewModel.ProjectDescription, Mode=TwoWay}"
-                            PlaceholderText="Description du projet"
-                            AcceptsReturn="True"
-                            TextWrapping="Wrap"
-                            Height="100"/>
-                    </StackPanel>
+            </Grid>
+        </Border>
 
-                    <!-- Boutons d'action (bas du panel) -->
-                    <StackPanel
-                        Grid.Row="6"
-                        Orientation="Horizontal"
-                        Spacing="12"
-                        HorizontalAlignment="Right"
-                        Margin="0,6,0,0">
-
-                        <!-- Annuler -->
-                        <Button
-                            Content="Annuler"
-                            Command="{x:Bind ViewModel.CancelEditCommand}"
-                            Background="#333333"
-                            Foreground="#F7FCFE"
-                            BorderBrush="#555555"
-                            BorderThickness="1"
-                            CornerRadius="20"
-                            Padding="20,8"/>
-
-                        <!-- Sauvegarder -->
-                        <Button
-                            Content="Enregistrer les modifications"
-                            Command="{x:Bind ViewModel.SaveProjectCommand}"
-                            Background="#4CAF82"
-                            Foreground="#FFFFFF"
-                            BorderThickness="0"
-                            CornerRadius="20"
-                            Padding="20,8"
-                            FontWeight="SemiBold"/>
-
-                    </StackPanel>
-
-                </Grid>
-            </Border>
-
-        </Grid>
     </Grid>
 </Page>
