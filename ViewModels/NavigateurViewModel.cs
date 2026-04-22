@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Thiskord_Front.Models;
@@ -39,6 +40,7 @@ namespace Thiskord_Front.ViewModels
         public event Action? OnJoinProject;
 
         public event Action? OnProjectCreate;
+        public event Action? OnInviteTokenReceived; 
 
         [RelayCommand]
         public async Task LoadProjects()
@@ -144,6 +146,18 @@ namespace Thiskord_Front.ViewModels
         public void UpdateProject(Project project)
         {
             SelectedProject = project;
+        }
+
+        [RelayCommand]
+        private async Task Invite()
+        {
+            if (SelectedProject is null) return;
+            OnInviteTokenReceived?.Invoke();
+        }
+        public async Task<string?> GenerateInvitationToken(string expiresAt)
+        {
+            var token = await _projectService.InviteToProject(SelectedProject.id, expiresAt);
+            return token;
         }
     }
 }

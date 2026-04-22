@@ -1,11 +1,13 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.ViewModels;
+using Windows.ApplicationModel.DataTransfer;
 
 namespace Thiskord_Front.Views
 {
@@ -34,8 +36,10 @@ namespace Thiskord_Front.Views
         {
             base.OnNavigatedTo(e);
             ViewModel.RequestEditProject += NavigateToProjectSettings;
+            ViewModel.OnInviteTokenReceived += ShowInviteGenerationDialog;
             ViewModel.OnLogoutSuccess += OnLogoutSuccess;
-            ViewModel.RequestEditChannel += OnRequesEditChannel;
+            ViewModel.RequestEditChannel += OnRequestEditChannel;
+            ViewModel.OnProjectCreate += CreateProjectTask;
 
             if (e.Parameter is Project project)
             {
@@ -51,12 +55,201 @@ namespace Thiskord_Front.Views
             base.OnNavigatedFrom(e);
             ViewModel.RequestEditProject -= NavigateToProjectSettings;
             ViewModel.OnLogoutSuccess -= OnLogoutSuccess;
-            ViewModel.RequestEditChannel -= OnRequesEditChannel;
+            ViewModel.RequestEditChannel -= OnRequestEditChannel;
+            ViewModel.OnProjectCreate -= CreateProjectTask;
+            ViewModel.OnInviteTokenReceived -= ShowInviteGenerationDialog;
         }
 
         private void NavigateToProjectSettings(Project project) { this.Frame.Navigate(typeof(ProjectSettings), project); }
         private void OnLogoutSuccess() { this.Frame.Navigate(typeof(Login)); }
-        private void OnRequesEditChannel(Channel channel) { _ = EditChannelAsync(channel); }
+        private void OnRequestEditChannel(Channel channel) { _ = EditChannelAsync(channel); }
+
+        private async void ShowInviteGenerationDialog()
+        {
+            string? generatedToken = null;
+
+            ContentDialog dialog = null;
+
+            var generateText = new TextBlock
+            {
+                Text = "Création d'un lien d'invitation pour votre projet",
+                TextWrapping = TextWrapping.Wrap
+            };
+
+            var expiresAtPicker = new DatePicker
+            {
+                Header = "Date d'expiration du token",
+            };
+
+            var generateButton = new Button
+            {
+                Content = "Générer l'invitation",
+            };
+
+            var errorMessageBlock = new TextBlock
+            {
+                Visibility = Visibility.Collapsed,
+                Text = ""
+            };
+
+            generateButton.Click += async (s, e) =>
+            {
+                if (expiresAtPicker.SelectedDate == null)
+                {
+                    errorMessageBlock.Text = "Choisissez une date d'expiration valide.";
+                    errorMessageBlock.Visibility = Visibility.Visible;
+                    return;
+                }
+
+                string? expiresAt = expiresAtPicker.Date.ToString("yyyy-MM-dd");
+
+                generatedToken = await ViewModel.GenerateInvitationToken(expiresAt);
+                if (!string.IsNullOrEmpty(generatedToken))
+                {
+                    dialog.Hide();
+                }
+                else
+                {
+                    errorMessageBlock.Text = "Une erreur est survenue lors de la génération du lien d'invitation.";
+                    errorMessageBlock.Visibility = Visibility.Visible;
+                }
+
+            };  
+
+            var container = new StackPanel
+            {
+                Spacing = 16,
+                Children = { generateText, expiresAtPicker, generateButton, errorMessageBlock }
+            };
+
+
+
+            dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Lien d'invitation",
+                Content = container,
+                PrimaryButtonText = "Fermer",
+                DefaultButton = ContentDialogButton.None,
+                MinWidth = 420
+            };
+
+            await dialog.ShowAsync();
+
+            if (!string.IsNullOrEmpty(generatedToken))
+            {
+                ShowInviteDialog(generatedToken);
+            }
+        }
+
+        private async void ShowInviteDialog(string token)
+        {
+            var tokenCard = new Border
+            {
+                Background = (Brush)Application.Current.Resources["CardBackgroundFillColorDefaultBrush"],
+                BorderBrush = (Brush)Application.Current.Resources["CardStrokeColorDefaultBrush"],
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(16, 12, 16, 12),
+                Margin = new Thickness(0, 16, 0, 0)
+            };
+
+            var tokenText = new TextBlock
+            {
+                Text = token,
+                TextWrapping = TextWrapping.Wrap,
+                FontFamily = new FontFamily("Cascadia Code, Consolas, monospace"),
+                FontSize = 13,
+                Foreground = (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"],
+                IsTextSelectionEnabled = true,
+                LineHeight = 20
+            };
+
+            tokenCard.Child = tokenText;
+
+            var helperText = new TextBlock
+            {
+                Text = "Partagez ce lien pour inviter quelqu'un à rejoindre votre projet.",
+                TextWrapping = TextWrapping.Wrap,
+                FontSize = 13,
+                Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
+                Margin = new Thickness(0, 0, 0, 0)
+            };
+
+            var copyIcon = new FontIcon { Glyph = "\uE8C8", FontSize = 14 };
+            var copyLabel = new TextBlock { Text = "Copier le lien" };
+
+            var copyButtonContent = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children = { copyIcon, copyLabel }
+            };
+
+            var copyButton = new Button
+            {
+                Content = copyButtonContent,
+                Style = (Style)Application.Current.Resources["AccentButtonStyle"],
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness(0, 12, 0, 0),
+                Padding = new Thickness(0, 10, 0, 10)
+            };
+
+            var feedbackText = new TextBlock
+            {
+                Text = "✓  Copié dans le presse-papiers",
+                FontSize = 12,
+                Foreground = (Brush)Application.Current.Resources["SystemFillColorSuccessBrush"],
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(0, 8, 0, 0),
+                Opacity = 0,
+                Visibility = Visibility.Collapsed
+            };
+
+            copyButton.Click += async (s, e) =>
+            {
+                var dataPackage = new DataPackage();
+                dataPackage.SetText(token);
+                Clipboard.SetContent(dataPackage);
+
+                copyIcon.Glyph = "\uE8FB";
+                copyLabel.Text = "Copié !";
+                copyButton.IsEnabled = false;
+                feedbackText.Visibility = Visibility.Visible;
+                feedbackText.Opacity = 1;
+
+                await Task.Delay(2000);
+
+                copyIcon.Glyph = "\uE8C8";
+                copyLabel.Text = "Copier le lien";
+                copyButton.IsEnabled = true;
+                feedbackText.Opacity = 0;
+                feedbackText.Visibility = Visibility.Collapsed;
+            };
+
+            var container = new StackPanel
+            {
+                Spacing = 0,
+                Children = { helperText, tokenCard, copyButton, feedbackText }
+            };
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Lien d'invitation",
+                Content = container,
+                PrimaryButtonText = "Fermer",
+                DefaultButton = ContentDialogButton.None,
+                MinWidth = 420
+            };
+
+            await dialog.ShowAsync();
+        }
+
+        private async void CreateProjectTask()
+        {
+            await CreateProject();
+        }
 
         private async void ServerMenuFlyout_Opening(object sender, object e)
         {
