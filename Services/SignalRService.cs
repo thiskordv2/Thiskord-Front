@@ -41,24 +41,25 @@ namespace Thiskord_Front.Services
 
             _hubConnection.On<List<MessageDto>>("LoadMessages", (messages) =>
             {
-               
+
                 foreach (var m in messages)
                 {
                     OnMessageReceived?.Invoke(new Message
                     {
                         Id = m.Id,
-                        MsgAuthor = m.User,
-                        MsgText = $"{m.Text}",
-                        MsgDateTime = m.DateTime,
+                        MsgAuthor = m.Username,
+                        MsgText = $"{m.Content}",
+                        MsgDateTime = m.CreatedAt,
                         MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
                     });
                 }
             });
 
-            _hubConnection.On<string, string, string>("ReceiveMessage", (user, text, dateTime) =>
-            { 
+            _hubConnection.On<int, string, string, string>("ReceiveMessage", (id, user, text, dateTime) =>
+            {
                 var message = new Message
                 {
+                    Id=id,
                     MsgAuthor = user,
                     MsgText = $"{text}",
                     MsgDateTime = dateTime,

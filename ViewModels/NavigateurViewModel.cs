@@ -1,14 +1,18 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Thiskord_Front.Models.GestionProjet;
+using Thiskord_Front.Models;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.Services;
+using Thiskord_Front.Views;
 
 namespace Thiskord_Front.ViewModels
 {
@@ -18,18 +22,30 @@ namespace Thiskord_Front.ViewModels
         private readonly ProjectService _projectService = new();
         private readonly ChannelService _channelService = new();
         private readonly SprintService _sprintService = new();
+        private readonly UserService _userService = new();
 
         [ObservableProperty]
-        private string selectedProjectName = "Mes serveurs";
+        private Project? selectedProject;
+
+        [ObservableProperty] private string joinMessage = null;
+        [ObservableProperty]
+        private Channel? selectedChannel;
+
         [ObservableProperty]
         private bool isLoadingProjects;
         public ObservableCollection<Channel> Channels { get; } = new();
         public ObservableCollection<Project> Projects { get; } = new();
+        public ObservableCollection<UserAccount> Users { get;  } = new();
 
         public ObservableCollection<Sprint> Sprints { get; } = new();
 
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
+        public event Action<Project>? RequestEditProject;
+        public event Action? OnJoinProject;
+
+        public event Action? OnProjectCreate;
+        public event Action? OnInviteTokenReceived; 
 
         [RelayCommand]
         public async Task LoadProjects()
@@ -49,12 +65,12 @@ namespace Thiskord_Front.ViewModels
         public async Task SelectProject(Project project)
         {
             if (project == null) return;
-            SelectedProjectName = project.name ?? "Projet sans nom";
-
+            SelectedProject = project;
             var channels = await _channelService.GetChannelsForProject(project.id);
             var sprints = await _sprintService.GetSprint(project.id);
             Channels.Clear();
             sprints.Clear();
+            if (channels == null) { selectedChannel = null; return; }
             foreach (var c in channels) Channels.Add(c);
             foreach (var s in sprints) Sprints.Add(s);
         }
@@ -91,6 +107,86 @@ namespace Thiskord_Front.ViewModels
             }
 
             return success;
+        }
+
+        [RelayCommand]
+        public void JoinProject()
+        {
+            OnJoinProject?.Invoke();
+        }
+
+        [RelayCommand]
+        public async Task JoinProjectBtn(string url)
+        {
+            try
+            {
+                var uri = new Uri(url);
+                string token = uri.Segments.Last();
+                string? result = await _projectService.JoinProject(token);
+                JoinMessage = result ?? "Erreur lors de la tentative de rejoindre le projet.";
+            }
+            catch (UriFormatException)
+            {
+                JoinMessage = "L'URL fournie est invalide.";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Erreur JoinProjectBtn: " + ex.Message);
+                JoinMessage = "Une erreur inattendue est survenue.";
+            }
+        }
+
+        [RelayCommand]
+        private void CreateProjectBtn() { OnProjectCreate?.Invoke(); }
+
+        public async Task<bool> ConfirmCreateProject(string projectName, string projectDesc)
+        {
+            if (string.IsNullOrWhiteSpace(projectName))
+                return false;
+
+            bool success = await _projectService.CreateProject(projectName, projectDesc);
+            if (!success)
+                return false;
+
+            var projects = await _projectService.GetAllProjects();
+            Projects.Clear();
+            foreach (var p in projects)
+                Projects.Add(p);
+
+            return true;
+        }
+        public async Task LoadUsers()
+        {
+            Users.Clear();
+            var result = await _userService.GetAllUsersForProject(SelectedProject.id);
+            foreach (var user in result)
+            {
+                Users.Add(user);
+            }    
+        }
+
+        [RelayCommand]
+        private void ProjectSettings()
+        {
+            Project project = SelectedProject;
+            RequestEditProject?.Invoke(project);
+        }
+
+        public void UpdateProject(Project project)
+        {
+            SelectedProject = project;
+        }
+
+        [RelayCommand]
+        private async Task Invite()
+        {
+            if (SelectedProject is null) return;
+            OnInviteTokenReceived?.Invoke();
+        }
+        public async Task<string?> GenerateInvitationToken(string expiresAt)
+        {
+            var token = await _projectService.InviteToProject(SelectedProject.id, expiresAt);
+            return token;
         }
     }
 }
