@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Thiskord_Front.Models;
@@ -24,6 +25,7 @@ namespace Thiskord_Front.ViewModels
         [ObservableProperty]
         private Project? selectedProject;
 
+        [ObservableProperty] private string joinMessage = null;
         [ObservableProperty]
         private Channel? selectedChannel;
 
@@ -36,8 +38,10 @@ namespace Thiskord_Front.ViewModels
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
         public event Action<Project>? RequestEditProject;
+        public event Action? OnJoinProject;
 
         public event Action? OnProjectCreate;
+        public event Action? OnInviteTokenReceived; 
 
         [RelayCommand]
         public async Task LoadProjects()
@@ -101,7 +105,28 @@ namespace Thiskord_Front.ViewModels
         [RelayCommand]
         public void JoinProject()
         {
-            // Logique pour rejoindre un serveur
+            OnJoinProject?.Invoke();
+        }
+
+        [RelayCommand]
+        public async Task JoinProjectBtn(string url)
+        {
+            try
+            {
+                var uri = new Uri(url);
+                string token = uri.Segments.Last();
+                string? result = await _projectService.JoinProject(token);
+                JoinMessage = result ?? "Erreur lors de la tentative de rejoindre le projet.";
+            }
+            catch (UriFormatException)
+            {
+                JoinMessage = "L'URL fournie est invalide.";
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Erreur JoinProjectBtn: " + ex.Message);
+                JoinMessage = "Une erreur inattendue est survenue.";
+            }
         }
 
         [RelayCommand]
@@ -126,7 +151,7 @@ namespace Thiskord_Front.ViewModels
         public async Task LoadUsers()
         {
             Users.Clear();
-            var result = await _userService.GetAllUsers();
+            var result = await _userService.GetAllUsersForProject(SelectedProject.id);
             foreach (var user in result)
             {
                 Users.Add(user);
@@ -143,6 +168,18 @@ namespace Thiskord_Front.ViewModels
         public void UpdateProject(Project project)
         {
             SelectedProject = project;
+        }
+
+        [RelayCommand]
+        private async Task Invite()
+        {
+            if (SelectedProject is null) return;
+            OnInviteTokenReceived?.Invoke();
+        }
+        public async Task<string?> GenerateInvitationToken(string expiresAt)
+        {
+            var token = await _projectService.InviteToProject(SelectedProject.id, expiresAt);
+            return token;
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Thiskord_Front.ViewModels
             ProjectActuelle = project;
             ProjectName = project.name;
             ProjectDescription = project.description;
-            EditTitle = $"Modifier le Project {ProjectName}";
+            EditTitle = $"Modifier {ProjectName}";
         }
 
         [RelayCommand]

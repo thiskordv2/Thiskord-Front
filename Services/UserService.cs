@@ -33,5 +33,28 @@ namespace Thiskord_Front.Services
                 return new List<UserAccount?>();
             }
         }
+
+        public async Task<List<UserAccount?>> GetAllUsersForProject(int projectId)
+        {
+            string jsonResult = await this.apiService.CallApiAsync($"user/project/{projectId}", "GET", null);
+            if (!string.IsNullOrEmpty(jsonResult))
+            {
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                try
+                {
+                    var users = JsonSerializer.Deserialize<List<UserAccount>>(jsonResult, options) ?? new List<UserAccount>();
+                    return users;
+                }
+                catch (JsonException ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Erreur Désérialisation: " + ex.Message);
+                    return new List<UserAccount?>();
+                }
+            }
+            else
+            {
+                return new List<UserAccount?>();
+            }
+        }
     }
 }

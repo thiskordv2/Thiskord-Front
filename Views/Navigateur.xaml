@@ -78,7 +78,7 @@
                                 <FontIcon Glyph="&#xE710;" />
                             </MenuFlyoutItem.Icon>
                         </MenuFlyoutItem>
-                        <MenuFlyoutItem Text="Rejoindre un projet">
+                        <MenuFlyoutItem Text="Rejoindre un projet" Command="{x:Bind ViewModel.JoinProjectCommand}">
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xE8FD;" />
                             </MenuFlyoutItem.Icon>
@@ -167,11 +167,29 @@
             </ListView>
             <Button 
                 x:Name="ButtonEditProject"
-                Command="{x:Bind ViewModel.ProjectSettingsCommand}" 
                 Grid.Row="2" 
                 HorizontalAlignment="Right" 
-                Margin="0, 0, 10, 10" >
+                Margin="0, 0, 10, 10">
                 <FontIcon Glyph="&#xE713;" />
+                <Button.Flyout>
+                    <MenuFlyout Placement="Top">
+                        <MenuFlyoutItem 
+                            Text="Modifier le projet"
+                            Command="{x:Bind ViewModel.ProjectSettingsCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE70F;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+
+                        <MenuFlyoutItem 
+                            Text="Inviter des personnes"
+                            Command="{x:Bind ViewModel.InviteCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8FA;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Button.Flyout>
             </Button>
         </Grid>
         
