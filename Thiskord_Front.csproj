@@ -47,7 +47,7 @@
     <PackageReference Include="System.Text.Json" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\SprintPage.xaml">
+    <Page Update="Views\SprintPage.xaml" />
     <Page Update="Views\ProjectSettings.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
