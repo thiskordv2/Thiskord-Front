@@ -19,14 +19,14 @@ namespace Thiskord_Front.ViewModels
         [ObservableProperty]
         private string messageInput = string.Empty ;
         public ObservableCollection<Message> Messages { get; } = new();
-
+        private bool _isEditing = false;
         public async Task InitializeAsync(Channel channel)
         {
             Messages.Clear();
 
             _chatService.OnMessageReceived += OnMessageReceived;
             _chatService.OnMessageDeleted += OnMessageDeleted;
-
+            _chatService.OnMessageEdited += OnMessageEdited;
             try
             {
                 await _chatService.ConnectAsync();
@@ -42,16 +42,29 @@ namespace Thiskord_Front.ViewModels
         {
             _chatService.OnMessageDeleted -= OnMessageDeleted;
             _chatService.OnMessageReceived -= OnMessageReceived;
+            _chatService.OnMessageEdited -= OnMessageEdited;
             await _chatService.LeaveCurrentChannelAsync();
         }
 
         [RelayCommand]
         private void SetContextMessage(Message message) => ContextMessage = message;
 
+        [RelayCommand]
+        private void PrepareEditMessage(Message message)
+        {
+            ContextMessage = message;
+            MessageInput = message.MsgText;
+            _isEditing = true;
+        }
         private bool CanSend() => !string.IsNullOrWhiteSpace(MessageInput);
         [RelayCommand(CanExecute = nameof(CanSend))]
         private async Task SendMessage()
         {
+            if (_isEditing)
+            {
+                await EditMessage();
+                return;
+            }
             var message = MessageInput.Trim();
             MessageInput = string.Empty;
             try
@@ -100,7 +113,20 @@ namespace Thiskord_Front.ViewModels
                 if (msg is not null) Messages.Remove(msg);
             });
 
+        private void OnMessageEdited(Message message)
+            => OnDispatchRequired?.Invoke(() =>
+            {
+                var existing = Messages.FirstOrDefault(m => m.Id == message.Id);
+                if (existing is not null)
+                {
+                    var idx = Messages.IndexOf(existing);
+                    if (idx >= 0) Messages[idx] = message;
+                }
+            });
+
         partial void OnMessageInputChanged(string value)
             => SendMessageCommand.NotifyCanExecuteChanged();
+
+
     }
 }

@@ -18,7 +18,7 @@ namespace Thiskord_Front.Services
 
         public event Action<Message>? OnMessageReceived;
         public event Action<int>? OnMessageDeleted;
-        public event Action<Message>? OnMessageUpdated;
+        public event Action<Message>? OnMessageEdited;
         public readonly SessionService _sessionService;
 
         private ChatService()
@@ -73,11 +73,16 @@ namespace Thiskord_Front.Services
             {
                 OnMessageDeleted?.Invoke(messageId);
             });
-
-            _hubConnection.On<int, string>("UpdateMessage", (messageId, newText) =>
+            _hubConnection.On<int, string>("EditMessage", (messageId, newText) =>
             {
-                OnMessageUpdated?.Invoke(new Message { Id = messageId, MsgText = newText });
-            });
+                var editedMessage = new Message
+                {
+                    Id = messageId,
+                    MsgText = newText,
+                    MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
+                };
+                OnMessageEdited?.Invoke(editedMessage);
+            }); ;
 
             await _hubConnection.StartAsync();
         }
@@ -120,10 +125,11 @@ namespace Thiskord_Front.Services
             await _hubConnection!.InvokeAsync("DeleteMessage", _currentChannelId.Value, messageId);
         }
 
-        public async Task EditMessageAsync(int messageId, string newText)
+        public async Task EditMessage(int messageId, string newText)
         {
             if (!IsConnected || !_currentChannelId.HasValue) return;
-            await _hubConnection!.InvokeAsync("UpdateMessage", _currentChannelId.Value, messageId, newText);
+            await _hubConnection!.InvokeAsync("EditMessage", _currentChannelId.Value, messageId, newText);
+            // FIX: supprimé l'appel manuel à OnMessageEdited — le hub le déclenche pour tous les clients
         }
     }
 }

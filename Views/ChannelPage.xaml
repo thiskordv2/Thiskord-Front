@@ -28,8 +28,13 @@
                         <TextBlock Text="{x:Bind MsgText}" FontSize="20" Foreground="{ThemeResource SystemColorHighlightTextColor}" TextWrapping="Wrap" Padding="0, 0, 0, 0" RightTapped="Message_RightTapped">
                             <TextBlock.ContextFlyout>
                                 <MenuFlyout>
-                                    <MenuFlyoutItem Tag="edit" Text="Modifier" Icon="Edit" Command="{Binding ElementName=ChannelPageSelf, Path=ViewModel.EditMessageCommand}"/>
-                                    <MenuFlyoutItem Tag="delete" Text="Supprimer" Icon="Delete" Command="{Binding ElementName=ChannelPageSelf, Path=ViewModel.DeleteMessageCommand}"/>
+                                    <!-- FIX: utilise PrepareEditMessageCommand avec CommandParameter -->
+                                    <MenuFlyoutItem Tag="edit" Text="Modifier" Icon="Edit"
+                                         Command="{Binding ElementName=ChannelPageSelf, Path=ViewModel.PrepareEditMessageCommand}"
+                                         CommandParameter="{x:Bind}"/>
+                                    <MenuFlyoutItem Tag="delete" Text="Supprimer" Icon="Delete"
+                                         Command="{Binding ElementName=ChannelPageSelf, Path=ViewModel.DeleteMessageCommand}"
+                                         CommandParameter="{x:Bind}"/>
                                 </MenuFlyout>
                             </TextBlock.ContextFlyout>
                         </TextBlock>
