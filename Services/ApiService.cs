@@ -19,7 +19,7 @@ namespace Thiskord_Front.Services
             _sessionService = SessionService.Instance;
             if (client.BaseAddress == null)
             {
-                client.BaseAddress = new Uri("http://10.186.59.178:8080/api/");
+                client.BaseAddress = new Uri("http://172.25.61.178:8080/api/");
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
