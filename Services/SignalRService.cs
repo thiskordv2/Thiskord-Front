@@ -18,6 +18,7 @@ namespace Thiskord_Front.Services
 
         public event Action<Message>? OnMessageReceived;
         public event Action<int>? OnMessageDeleted;
+        public event Action<Message>? OnMessageUpdated;
         public readonly SessionService _sessionService;
 
         private ChatService()
@@ -73,6 +74,11 @@ namespace Thiskord_Front.Services
                 OnMessageDeleted?.Invoke(messageId);
             });
 
+            _hubConnection.On<int, string>("UpdateMessage", (messageId, newText) =>
+            {
+                OnMessageUpdated?.Invoke(new Message { Id = messageId, MsgText = newText });
+            });
+
             await _hubConnection.StartAsync();
         }
 
@@ -112,6 +118,12 @@ namespace Thiskord_Front.Services
         {
             if (!IsConnected || !_currentChannelId.HasValue) return;
             await _hubConnection!.InvokeAsync("DeleteMessage", _currentChannelId.Value, messageId);
+        }
+
+        public async Task EditMessageAsync(int messageId, string newText)
+        {
+            if (!IsConnected || !_currentChannelId.HasValue) return;
+            await _hubConnection!.InvokeAsync("UpdateMessage", _currentChannelId.Value, messageId, newText);
         }
     }
 }
