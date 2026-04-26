@@ -31,6 +31,7 @@ namespace Thiskord_Front.Views
             base.OnNavigatedTo(e);
             ViewModel.ProjectUpdateSuccessful += OnProjectUpdateSuccessful;
             ViewModel.ProjectUpdateCancelled += OnProjectUpdateCancelled;
+            ViewModel.AskConfirmDelete += OnAskConfirmDelete;
             ViewModel.ProjectDeleteSuccessful += OnProjectDeleteSuccessful;
 
             if (e.Parameter is Project project)
@@ -41,19 +42,36 @@ namespace Thiskord_Front.Views
         {
             base.OnNavigatedFrom(e);
             ViewModel.ProjectUpdateSuccessful -= OnProjectUpdateSuccessful; 
-            ViewModel.ProjectUpdateCancelled -= OnProjectUpdateCancelled;  
+            ViewModel.ProjectUpdateCancelled -= OnProjectUpdateCancelled;
+            ViewModel.AskConfirmDelete -= OnAskConfirmDelete;
             ViewModel.ProjectDeleteSuccessful -= OnProjectDeleteSuccessful; 
         }
 
         private void OnProjectUpdateSuccessful(Project project) => ReturnToNavigateur(project);
         private void OnProjectUpdateCancelled(Project project) => ReturnToNavigateur(project);
         private void OnProjectDeleteSuccessful() { this.Frame.Navigate(typeof(Navigateur)); }
+
+        private async void OnAskConfirmDelete()
+        {
+            var titleConfirm = new TextBlock { Text = $"Etes vous sur de vouloir supprimé {ViewModel.ProjectName}?" };
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Confirmation de suppression",
+                Content = titleConfirm,
+                PrimaryButtonText = "Supprimer",
+                CloseButtonText = "Annuler"
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result != ContentDialogResult.Primary) return;
+            ViewModel.DeleteProjectCommand.Execute(null);
+        }
         private void ReturnToNavigateur(Project project)
         {
             if (Frame.CanGoBack)
-            {
                 this.Frame.Navigate(typeof(Navigateur), project);
-            }
         }
     }
 }
