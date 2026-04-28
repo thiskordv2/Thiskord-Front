@@ -18,6 +18,7 @@ namespace Thiskord_Front.Services
 
         public event Action<Message>? OnMessageReceived;
         public event Action<int>? OnMessageDeleted;
+        public event Action<Message>? OnMessageEdited;
         public readonly SessionService _sessionService;
 
         private ChatService()
@@ -72,6 +73,19 @@ namespace Thiskord_Front.Services
             {
                 OnMessageDeleted?.Invoke(messageId);
             });
+            
+
+            _hubConnection.On<int, string, string>("EditMessage", (messageId, newText, updated_at) =>
+            {
+                var editedMessage = new Message
+                {
+                    Id = messageId,
+                    MsgText = newText,
+                    MsgDateTime = updated_at,
+                    MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
+                };
+                OnMessageEdited?.Invoke(editedMessage);
+            }); ;
 
             await _hubConnection.StartAsync();
         }
@@ -112,6 +126,13 @@ namespace Thiskord_Front.Services
         {
             if (!IsConnected || !_currentChannelId.HasValue) return;
             await _hubConnection!.InvokeAsync("DeleteMessage", _currentChannelId.Value, messageId);
+        }
+
+        public async Task EditMessage(int messageId, string newText)
+        {
+            if (!IsConnected || !_currentChannelId.HasValue) return;
+            await _hubConnection!.InvokeAsync("EditMessage", _currentChannelId.Value, messageId, newText);
+            // FIX: supprimé l'appel manuel à OnMessageEdited — le hub le déclenche pour tous les clients
         }
     }
 }

@@ -19,14 +19,14 @@ namespace Thiskord_Front.ViewModels
         [ObservableProperty]
         private string messageInput = string.Empty ;
         public ObservableCollection<Message> Messages { get; } = new();
-
+        private bool _isEditing = false;
         public async Task InitializeAsync(Channel channel)
         {
             Messages.Clear();
 
             _chatService.OnMessageReceived += OnMessageReceived;
             _chatService.OnMessageDeleted += OnMessageDeleted;
-
+            _chatService.OnMessageEdited += OnMessageEdited;
             try
             {
                 await _chatService.ConnectAsync();
@@ -42,16 +42,33 @@ namespace Thiskord_Front.ViewModels
         {
             _chatService.OnMessageDeleted -= OnMessageDeleted;
             _chatService.OnMessageReceived -= OnMessageReceived;
+            _chatService.OnMessageEdited -= OnMessageEdited;
             await _chatService.LeaveCurrentChannelAsync();
         }
 
         [RelayCommand]
         private void SetContextMessage(Message message) => ContextMessage = message;
 
+        [RelayCommand]
+        private void PrepareEditMessage(Message message)
+        {
+            ContextMessage = message;
+            MessageInput = message.MsgText;
+            _isEditing = true;
+        }
         private bool CanSend() => !string.IsNullOrWhiteSpace(MessageInput);
         [RelayCommand(CanExecute = nameof(CanSend))]
         private async Task SendMessage()
         {
+            if (_isEditing)
+            {
+                var editedMessage = MessageInput.Trim();
+                await _chatService.EditMessage(ContextMessage!.Id, editedMessage);
+                _isEditing = false;
+                ContextMessage = null;
+                MessageInput = string.Empty;
+                return;
+            }
             var message = MessageInput.Trim();
             MessageInput = string.Empty;
             try
@@ -65,12 +82,12 @@ namespace Thiskord_Front.ViewModels
         }
 
         [RelayCommand]
-        private async Task DeleteMessage()
+        private async Task DeleteMessage(Message message)
         {
-            if (ContextMessage is null) return;
+            if (message is null) return;
             try
             {
-                await _chatService.DeleteMessage(ContextMessage.Id);
+                await _chatService.DeleteMessage(message.Id);
             }
             catch (Exception ex)
             {
@@ -80,12 +97,6 @@ namespace Thiskord_Front.ViewModels
             {
                 ContextMessage = null;
             }
-        }
-
-        [RelayCommand]
-        private async Task EditMessage()
-        {
-            var message = MessageInput.Trim();
         }
 
         public event Action<Action>? OnDispatchRequired;
@@ -100,7 +111,32 @@ namespace Thiskord_Front.ViewModels
                 if (msg is not null) Messages.Remove(msg);
             });
 
+        private void OnMessageEdited(Message message)
+            => OnDispatchRequired?.Invoke(() =>
+            {
+                var existing = Messages.FirstOrDefault(m => m.Id == message.Id);
+                if (existing is not null)
+                {
+                    var index = Messages.IndexOf(existing);
+                    if (index >= 0)
+                    {
+                        var updatedMessage = new Message
+                        {
+                            Id = existing.Id,
+                            MsgAuthor = existing.MsgAuthor,
+                            MsgDateTime = message.MsgDateTime,
+                            MsgAlignment = existing.MsgAlignment,
+                            MsgText = message.MsgText
+                        };
+
+                        Messages[index] = updatedMessage;
+                    }
+                }
+            });
+
         partial void OnMessageInputChanged(string value)
             => SendMessageCommand.NotifyCanExecuteChanged();
+
+
     }
 }
