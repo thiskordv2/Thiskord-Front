@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Thiskord_Front.Views"
     xmlns:models="using:Thiskord_Front.Models.Project"
+    xmlns:gestion="using:Thiskord_Front.Models.GestionProjet"
     xmlns:models2="using:Thiskord_Front.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,17 +12,18 @@
 
     <Grid x:Name="RootGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0" 
-          Width="125" 
+          Width="150" 
           HorizontalAlignment="Left" 
           VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -66,13 +68,36 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <StackPanel Grid.Row="2" Orientation="Vertical" Padding="0,0,0,10">
+            <ListView
+            Grid.Row="2"
+            x:Name="sprintListing"
+            ItemsSource="{x:Bind ViewModel.Sprints, Mode=OneWay}"
+            SelectionMode="Single"
+            SelectionChanged="SprintListing_SelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="gestion:Sprint">
+                        <TextBlock Text="{Binding DisplayName, Mode=OneWay}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <StackPanel Grid.Row="3" Orientation="Vertical" Padding="0,0,0,10">
                 <PersonPicture 
                 ProfilePicture="https://learn.microsoft.com/windows/uwp/contacts-and-calendar/images/shoulder-tap-static-payload.png" 
                 Width="50" Height="50"
                 HorizontalAlignment="Center"/>
                 <StackPanel.ContextFlyout>
                     <MenuFlyout>
+                        <MenuFlyoutItem Text="Créer un projet" Command="{x:Bind ViewModel.CreateProjectBtnCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE710;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                        <MenuFlyoutItem Text="Rejoindre un projet" Command="{x:Bind ViewModel.JoinProjectCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8FD;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
                         <MenuFlyoutItem Tag="disconnect" Text="Se déconnecter" Command="{x:Bind ViewModel.LogoutCommand}" >
                             <MenuFlyoutItem.Icon>
                                 <FontIcon Glyph="&#xF3B1;" />
@@ -85,7 +110,7 @@
 
         <TextBlock Grid.Column="1" 
                    Grid.Row="0"
-                   Text="{x:Bind ViewModel.SelectedProjectName, Mode=OneWay}"
+                   Text="{x:Bind ViewModel.SelectedProject.name, Mode=OneWay}"
                    FontSize="24"
                    Margin="10,10,0,10"/>
         
@@ -100,7 +125,7 @@
             </Frame.ContentTransitions>
         </Frame>
 
-        <Grid Grid.Column="2" VerticalAlignment="Stretch">
+        <Grid Grid.Column="2" VerticalAlignment="Stretch" x:Name="RightPanel" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -155,8 +180,31 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Button Command="{x:Bind ViewModel.ProjectSettingsCommand}" Grid.Row="2" HorizontalAlignment="Right" Margin="0, 0, 10, 10">
+            <Button 
+                x:Name="ButtonEditProject"
+                Grid.Row="2" 
+                HorizontalAlignment="Right" 
+                Margin="0, 0, 10, 10">
                 <FontIcon Glyph="&#xE713;" />
+                <Button.Flyout>
+                    <MenuFlyout Placement="Top">
+                        <MenuFlyoutItem 
+                            Text="Modifier le projet"
+                            Command="{x:Bind ViewModel.ProjectSettingsCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE70F;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+
+                        <MenuFlyoutItem 
+                            Text="Inviter des personnes"
+                            Command="{x:Bind ViewModel.InviteCommand}">
+                            <MenuFlyoutItem.Icon>
+                                <FontIcon Glyph="&#xE8FA;" />
+                            </MenuFlyoutItem.Icon>
+                        </MenuFlyoutItem>
+                    </MenuFlyout>
+                </Button.Flyout>
             </Button>
         </Grid>
         

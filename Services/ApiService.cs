@@ -66,8 +66,9 @@ namespace Thiskord_Front.Services
                 }
                 else
                 {
+                    string errorBody = await response.Content.ReadAsStringAsync();
                     System.Diagnostics.Debug.WriteLine("Erreur Api: " + (response?.StatusCode.ToString() ?? "Pas de réponse"));
-                    return null;
+                    return errorBody;
                 }
             }
             catch (Exception ex)
