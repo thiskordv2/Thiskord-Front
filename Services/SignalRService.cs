@@ -73,12 +73,15 @@ namespace Thiskord_Front.Services
             {
                 OnMessageDeleted?.Invoke(messageId);
             });
-            _hubConnection.On<int, string>("EditMessage", (messageId, newText) =>
+            
+
+            _hubConnection.On<int, string, string>("EditMessage", (messageId, newText, updated_at) =>
             {
                 var editedMessage = new Message
                 {
                     Id = messageId,
                     MsgText = newText,
+                    MsgDateTime = updated_at,
                     MsgAlignment = Microsoft.UI.Xaml.HorizontalAlignment.Left
                 };
                 OnMessageEdited?.Invoke(editedMessage);

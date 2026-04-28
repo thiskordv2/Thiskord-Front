@@ -62,7 +62,11 @@ namespace Thiskord_Front.ViewModels
         {
             if (_isEditing)
             {
-                await EditMessage();
+                var editedMessage = MessageInput.Trim();
+                await _chatService.EditMessage(ContextMessage!.Id, editedMessage);
+                _isEditing = false;
+                ContextMessage = null;
+                MessageInput = string.Empty;
                 return;
             }
             var message = MessageInput.Trim();
@@ -78,12 +82,12 @@ namespace Thiskord_Front.ViewModels
         }
 
         [RelayCommand]
-        private async Task DeleteMessage()
+        private async Task DeleteMessage(Message message)
         {
-            if (ContextMessage is null) return;
+            if (message is null) return;
             try
             {
-                await _chatService.DeleteMessage(ContextMessage.Id);
+                await _chatService.DeleteMessage(message.Id);
             }
             catch (Exception ex)
             {
@@ -93,12 +97,6 @@ namespace Thiskord_Front.ViewModels
             {
                 ContextMessage = null;
             }
-        }
-
-        [RelayCommand]
-        private async Task EditMessage()
-        {
-            var message = MessageInput.Trim();
         }
 
         public event Action<Action>? OnDispatchRequired;
@@ -119,8 +117,20 @@ namespace Thiskord_Front.ViewModels
                 var existing = Messages.FirstOrDefault(m => m.Id == message.Id);
                 if (existing is not null)
                 {
-                    var idx = Messages.IndexOf(existing);
-                    if (idx >= 0) Messages[idx] = message;
+                    var index = Messages.IndexOf(existing);
+                    if (index >= 0)
+                    {
+                        var updatedMessage = new Message
+                        {
+                            Id = existing.Id,
+                            MsgAuthor = existing.MsgAuthor,
+                            MsgDateTime = message.MsgDateTime,
+                            MsgAlignment = existing.MsgAlignment,
+                            MsgText = message.MsgText
+                        };
+
+                        Messages[index] = updatedMessage;
+                    }
                 }
             });
 
