@@ -19,7 +19,7 @@ namespace Thiskord_Front.Services
             _sessionService = SessionService.Instance;
             if (client.BaseAddress == null)
             {
-                client.BaseAddress = new Uri("http://localhost:8080/api/");
+                client.BaseAddress = new Uri("https://api.emre-ak.fr/api/");
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
