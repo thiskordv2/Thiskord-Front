@@ -33,7 +33,7 @@ namespace Thiskord_Front.Services
             if (IsConnected) return;
 
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:8080/chatHub", options =>
+                .WithUrl("http://api.emre-ak.fr/chatHub", options =>
                 {
                     options.AccessTokenProvider = () => Task.FromResult<string?>(_sessionService.Token);
                 })
