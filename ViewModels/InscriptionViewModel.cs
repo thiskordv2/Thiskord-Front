@@ -82,7 +82,7 @@ namespace Thiskord_Front.ViewModels
 
                     if (!string.IsNullOrEmpty(payload.token))
                     {
-                        sessionService.Login(payload.user.userName, payload.token);
+                        sessionService.Login(payload.user.userName, payload.token, payload.user.userId);
                         OnRegisterSuccess?.Invoke();
                         return;
                     }

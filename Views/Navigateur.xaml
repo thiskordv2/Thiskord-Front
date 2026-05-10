@@ -24,7 +24,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
@@ -68,18 +68,35 @@
                 </ListView.ItemTemplate>
             </ListView>
 
-            <ListView
-            Grid.Row="2"
-            x:Name="sprintListing"
-            ItemsSource="{x:Bind ViewModel.Sprints, Mode=OneWay}"
-            SelectionMode="Single"
-            SelectionChanged="SprintListing_SelectionChanged">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="gestion:Sprint">
-                        <TextBlock Text="{Binding DisplayName, Mode=OneWay}" />
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+            <Grid Grid.Row="2" Margin="0,0,0,10" Visibility="{x:Bind ViewModel.SprintSelectorVisibility, Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="40" />
+                </Grid.ColumnDefinitions>
+
+                <DropDownButton
+                    Grid.Column="0"
+                    Content="Sprints"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center">
+                    <DropDownButton.Flyout>
+                        <MenuFlyout x:Name="SprintMenuFlyout"
+                                    Placement="Bottom"
+                                    Opening="SprintMenuFlyout_Opening">
+                            <MenuFlyoutItem Text="Chargement"/>
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
+
+                <Button
+                    Grid.Column="1"
+                    Content="+"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Width="32"
+                    Height="32"
+                    Command="{x:Bind ViewModel.CreateSprintBtnCommand}"/>
+            </Grid>
 
             <StackPanel Grid.Row="3" Orientation="Vertical" Padding="0,0,0,10">
                 <PersonPicture 

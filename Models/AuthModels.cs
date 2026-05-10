@@ -27,6 +27,9 @@ namespace Thiskord_Front.Models
     
     public class User
     {
+        [JsonPropertyName("user_id")]
+        public int? userId { get; set; }
+
         [JsonPropertyName("user_name")]
         public string userName { get; set; } = "";
         [JsonPropertyName("user_mail")]
