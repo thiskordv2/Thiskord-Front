@@ -67,7 +67,6 @@ namespace Thiskord_Front.ViewModels
         public async Task SelectProject(Project project)
         {
             if (project == null) return;
-            SelectedProjectName = project.name ?? "Projet sans nom";
             _currentProjectId = project.id;
 
             SelectedProject = project;
