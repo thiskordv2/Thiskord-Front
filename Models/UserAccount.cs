@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Thiskord_Back.Models.Account
+namespace Thiskord_Front.Models
 {
     public class UserAccount
     {
