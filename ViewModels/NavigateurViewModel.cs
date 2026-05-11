@@ -33,6 +33,7 @@ namespace Thiskord_Front.ViewModels
 
         [ObservableProperty]
         private bool isLoadingProjects;
+        private int? _currentProjectId;
         public ObservableCollection<Channel> Channels { get; } = new();
         public ObservableCollection<Project> Projects { get; } = new();
         public ObservableCollection<UserAccount> Users { get;  } = new();
@@ -41,6 +42,7 @@ namespace Thiskord_Front.ViewModels
 
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
+        public event Action? RequestCreateChannel;
         public event Action<Project>? RequestEditProject;
         public event Action? OnJoinProject;
 
@@ -65,6 +67,9 @@ namespace Thiskord_Front.ViewModels
         public async Task SelectProject(Project project)
         {
             if (project == null) return;
+            SelectedProjectName = project.name ?? "Projet sans nom";
+            _currentProjectId = project.id;
+
             SelectedProject = project;
             var channels = await _channelService.GetChannelsForProject(project.id);
             var sprints = await _sprintService.GetSprint(project.id);
@@ -107,6 +112,25 @@ namespace Thiskord_Front.ViewModels
             }
 
             return success;
+        }
+        [RelayCommand]
+        private void CreateChannel() => RequestCreateChannel?.Invoke();
+
+        public async Task<bool> ConfirmCreateChannel(string channelName, string channelDesc)
+        {
+            if (string.IsNullOrWhiteSpace(channelName) || _currentProjectId is null)
+                return false;
+
+            bool success = await _channelService.CreateChannel(channelName, channelDesc, _currentProjectId.Value);
+            if (!success)
+                return false;
+
+            var channels = await _channelService.GetChannelsForProject(_currentProjectId.Value);
+            Channels.Clear();
+            foreach (var c in channels)
+                Channels.Add(c);
+
+            return true;
         }
 
         [RelayCommand]

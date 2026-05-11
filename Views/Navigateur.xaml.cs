@@ -61,6 +61,7 @@ namespace Thiskord_Front.Views
             ViewModel.OnProjectCreate -= CreateProjectTask;
             ViewModel.OnInviteTokenReceived -= ShowInviteGenerationDialog;
             ViewModel.OnJoinProject -= JoinProjectTask;
+            ViewModel.RequestCreateChannel += () => _ = CreateChannelAsync();
         }
 
         private void NavigateToProjectSettings(Project project) { this.Frame.Navigate(typeof(ProjectSettings), project); }
@@ -322,7 +323,6 @@ namespace Thiskord_Front.Views
         {
             if (channel.Id is null) return;
 
-            // Créer les TextBox pour l'édition
             var nameTextBox = new TextBox
             {
                 Text = channel.Name ?? "",
@@ -339,7 +339,6 @@ namespace Thiskord_Front.Views
                 Margin = new Thickness(0, 0, 0, 10)
             };
 
-            // Créer un StackPanel pour contenir les contrôles
             var contentPanel = new StackPanel
             {
                 Spacing = 10,
@@ -352,7 +351,6 @@ namespace Thiskord_Front.Views
                 }
             };
 
-            // Créer et afficher le ContentDialog
             var dialog = new ContentDialog
             {
                 XamlRoot = this.XamlRoot,
@@ -400,6 +398,79 @@ namespace Thiskord_Front.Views
             }
         }
 
+        // From feature/ChannelCreate
+        private async Task CreateChannelAsync()
+        {
+            var nameTextBox = new TextBox
+            {
+                PlaceholderText = "Nom du channel",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var descriptionTextBox = new TextBox
+            {
+                PlaceholderText = "Description (optionnelle)",
+                AcceptsReturn = true,
+                Height = 100,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var contentPanel = new StackPanel
+            {
+                Spacing = 10,
+                Children =
+                {
+                    new TextBlock { Text = "Nom:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
+                    nameTextBox,
+                    new TextBlock { Text = "Description:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
+                    descriptionTextBox
+                }
+            };
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Créer un channel",
+                Content = contentPanel,
+                PrimaryButtonText = "Créer",
+                SecondaryButtonText = "Annuler"
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                string newName = nameTextBox.Text.Trim();
+                string newDescription = descriptionTextBox.Text?.Trim() ?? "";
+
+                if (string.IsNullOrWhiteSpace(newName))
+                {
+                    await new ContentDialog
+                    {
+                        XamlRoot = this.XamlRoot,
+                        Title = "Erreur",
+                        Content = "Le nom du channel ne peut pas être vide.",
+                        PrimaryButtonText = "OK"
+                    }.ShowAsync();
+                    return;
+                }
+
+                bool success = await ViewModel.ConfirmCreateChannel(newName, newDescription);
+
+                if (!success)
+                {
+                    await new ContentDialog
+                    {
+                        XamlRoot = this.XamlRoot,
+                        Title = "Erreur",
+                        Content = "Impossible de créer le channel.",
+                        PrimaryButtonText = "OK"
+                    }.ShowAsync();
+                }
+            }
+        }
+
+        // From develop
         private async Task CreateProject()
         {
             var newProjectName = new TextBox
@@ -459,9 +530,7 @@ namespace Thiskord_Front.Views
                     return;
                 }
 
-                bool success = await ViewModel.ConfirmCreateProject(
-                    newName,
-                    newDescription);
+                bool success = await ViewModel.ConfirmCreateProject(newName, newDescription);
 
                 if (!success)
                 {
@@ -476,10 +545,12 @@ namespace Thiskord_Front.Views
             }
         }
 
+        // From develop
         private async void JoinProjectTask()
         {
             await JoinProject();
         }
+
         private async Task JoinProject()
         {
             var title = new TextBlock
