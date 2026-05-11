@@ -12,7 +12,7 @@ namespace Thiskord_Front.Services
 
         public async Task<List<SprintTask>> GetTasksBySprint(int sprintId)
         {
-            string jsonResult = await _apiService.CallApiAsync("api/sprinttask/sprint/task/{sprintId}", "GET");
+            string jsonResult = await _apiService.CallApiAsync($"sprinttask/sprint/task/{sprintId}", "GET");
             if (string.IsNullOrEmpty(jsonResult))
                 return new List<SprintTask>();
 
@@ -74,7 +74,7 @@ namespace Thiskord_Front.Services
                 return false;
 
             string jsonRequest = JsonSerializer.Serialize(task);
-            string jsonResult = await _apiService.CallApiAsync("api/task/task", "PATCH", jsonRequest);
+            string jsonResult = await _apiService.CallApiAsync($"sprinttask/task/{task.task_id}", "PATCH", jsonRequest);
             return !string.IsNullOrEmpty(jsonResult);
         }
 
@@ -83,7 +83,7 @@ namespace Thiskord_Front.Services
             if (taskId <= 0)
                 return false;
 
-            string jsonResult = await _apiService.CallApiAsync("api/task/task/{taskId}", "DELETE");
+            string jsonResult = await _apiService.CallApiAsync($"sprinttask/task/{taskId}", "DELETE");
             return !string.IsNullOrEmpty(jsonResult);
         }
     }

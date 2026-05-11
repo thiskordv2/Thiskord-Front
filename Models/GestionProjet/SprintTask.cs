@@ -25,6 +25,9 @@ namespace Thiskord_Front.Models.GestionProjet
 
         public int id_sprint { get; set; }
 
+        public string created_at { get; set; }
+        public string updated_at { get; set; }
+
         public SprintTask() { }
 
         public SprintTask(int _task_id, string _task_title, string _task_desc, bool _is_subtask, string _task_status, int _id_sprint)

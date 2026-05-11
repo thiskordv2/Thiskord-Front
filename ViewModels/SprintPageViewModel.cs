@@ -52,8 +52,6 @@ namespace Thiskord_Front.ViewModels
 
         public async Task<bool> ConfirmCreateTaskAsync(string title, string description, string status = "IN_PROGRESS")
         {
-            
-
             var task = new SprintTask
             {
                 task_title = title,
@@ -72,8 +70,20 @@ namespace Thiskord_Front.ViewModels
             {
                 await LoadTasksAsync();
             }
-
             return success;
+        }
+
+        [RelayCommand]
+        public async Task DeleteTask(SprintTask task)
+        {
+            if (task == null)
+                return;
+
+            bool success = await _taskService.DeleteTask(task.task_id);
+            if (success)
+            {
+                await LoadTasksAsync();
+            }
         }
     }
 }
