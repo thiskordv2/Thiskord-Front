@@ -38,7 +38,11 @@
                     </MenuFlyout>
                 </DropDownButton.Flyout>
             </DropDownButton>
-
+                <Button Content="+ Channel"
+                        HorizontalAlignment="Center"
+                        Command="{x:Bind ViewModel.CreateChannelCommand}"
+                        FontSize="11"
+                        Margin="0,5,0,0"/>
             </StackPanel>
             
             <ListView
