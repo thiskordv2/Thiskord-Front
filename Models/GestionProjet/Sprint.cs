@@ -12,15 +12,17 @@ namespace Thiskord_Front.Models.GestionProjet
         public string sprint_goal { get; set; }
         public string sprint_begin_date { get; set; }
         public string sprint_end_date { get; set; }
+        public int id_project_sprint { get; set; }
 
         public Sprint() { }
 
-        public Sprint(int sprint_id, string sprint_goal, string sprint_begin_date, string sprint_end_date)
+        public Sprint(int sprint_id, string sprint_goal, string sprint_begin_date, string sprint_end_date, int id_project_sprint)
         {
             this.sprint_id = sprint_id;
             this.sprint_goal = sprint_goal;
             this.sprint_begin_date = sprint_begin_date;
             this.sprint_end_date = sprint_end_date;
+            this.id_project_sprint = id_project_sprint;
         }
     }
 }

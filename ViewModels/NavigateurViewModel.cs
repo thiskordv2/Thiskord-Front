@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -22,29 +23,40 @@ namespace Thiskord_Front.ViewModels
         private readonly ProjectService _projectService = new();
         private readonly ChannelService _channelService = new();
         private readonly SprintService _sprintService = new();
+        private readonly TaskService _taskService = new();
         private readonly UserService _userService = new();
 
         [ObservableProperty]
         private Project? selectedProject;
+
+        public Visibility SprintSelectorVisibility => SelectedProject is null ? Visibility.Collapsed : Visibility.Visible;
 
         [ObservableProperty] private string joinMessage = null;
         [ObservableProperty]
         private Channel? selectedChannel;
 
         [ObservableProperty]
+        private Sprint? selectedSprint;
+
+        [ObservableProperty]
         private bool isLoadingProjects;
+        private int? _currentProjectId;
         public ObservableCollection<Channel> Channels { get; } = new();
         public ObservableCollection<Project> Projects { get; } = new();
         public ObservableCollection<UserAccount> Users { get;  } = new();
+        public ObservableCollection<SprintTask> Tasks { get; } = new();
 
         public ObservableCollection<Sprint> Sprints { get; } = new();
 
         public event Action? OnLogoutSuccess;
         public event Action<Channel>? RequestEditChannel;
+        public event Action? RequestCreateChannel;
         public event Action<Project>? RequestEditProject;
+        public event Action<Sprint>? RequestOpenSprint;
         public event Action? OnJoinProject;
 
         public event Action? OnProjectCreate;
+        public event Action? OnCreateSprint;
         public event Action? OnInviteTokenReceived; 
 
         [RelayCommand]
@@ -65,14 +77,42 @@ namespace Thiskord_Front.ViewModels
         public async Task SelectProject(Project project)
         {
             if (project == null) return;
+            _currentProjectId = project.id;
+
             SelectedProject = project;
+            SelectedSprint = null;
+            Tasks.Clear();
+
             var channels = await _channelService.GetChannelsForProject(project.id);
             var sprints = await _sprintService.GetSprint(project.id);
             Channels.Clear();
-            sprints.Clear();
-            if (channels == null) { selectedChannel = null; return; }
-            foreach (var c in channels) Channels.Add(c);
+            Sprints.Clear();
+            SelectedChannel = null;
+
+            if (channels != null)
+            {
+                foreach (var c in channels) Channels.Add(c);
+            }
+
             foreach (var s in sprints) Sprints.Add(s);
+        }
+
+        partial void OnSelectedProjectChanged(Project? value)
+        {
+            OnPropertyChanged(nameof(SprintSelectorVisibility));
+        }
+
+        [RelayCommand]
+        public async Task SelectSprint(Sprint sprint)
+        {
+            if (sprint == null) return;
+            SelectedSprint = sprint;
+            RequestOpenSprint?.Invoke(sprint);
+
+            Tasks.Clear();
+            var sprintTasks = await _taskService.GetTasksBySprint(sprint.sprint_id);
+            foreach (var task in sprintTasks)
+                Tasks.Add(task);
         }
 
         [RelayCommand]
@@ -108,6 +148,25 @@ namespace Thiskord_Front.ViewModels
 
             return success;
         }
+        [RelayCommand]
+        private void CreateChannel() => RequestCreateChannel?.Invoke();
+
+        public async Task<bool> ConfirmCreateChannel(string channelName, string channelDesc)
+        {
+            if (string.IsNullOrWhiteSpace(channelName) || _currentProjectId is null)
+                return false;
+
+            bool success = await _channelService.CreateChannel(channelName, channelDesc, _currentProjectId.Value);
+            if (!success)
+                return false;
+
+            var channels = await _channelService.GetChannelsForProject(_currentProjectId.Value);
+            Channels.Clear();
+            foreach (var c in channels)
+                Channels.Add(c);
+
+            return true;
+        }
 
         [RelayCommand]
         public void JoinProject()
@@ -139,6 +198,9 @@ namespace Thiskord_Front.ViewModels
         [RelayCommand]
         private void CreateProjectBtn() { OnProjectCreate?.Invoke(); }
 
+        [RelayCommand]
+        private void CreateSprintBtn() { OnCreateSprint?.Invoke(); }
+
         public async Task<bool> ConfirmCreateProject(string projectName, string projectDesc)
         {
             if (string.IsNullOrWhiteSpace(projectName))
@@ -152,6 +214,23 @@ namespace Thiskord_Front.ViewModels
             Projects.Clear();
             foreach (var p in projects)
                 Projects.Add(p);
+
+            return true;
+        }
+
+        public async Task<bool> ConfirmCreateSprint(string sprintGoal, string sprintBeginDate, string sprintEndDate)
+        {
+            if (SelectedProject == null || string.IsNullOrWhiteSpace(sprintGoal))
+                return false;
+
+            bool success = await _sprintService.CreateSprint(SelectedProject.id, sprintGoal, sprintBeginDate, sprintEndDate);
+            if (!success)
+                return false;
+
+            var sprints = await _sprintService.GetSprint(SelectedProject.id);
+            Sprints.Clear();
+            foreach (var sprint in sprints)
+                Sprints.Add(sprint);
 
             return true;
         }

@@ -14,47 +14,44 @@ namespace Thiskord_Front.Services
 
         public async Task<List<Sprint>> GetSprint(int projectId)
         {
-            string jsonResult = await apiService.CallApiAsync("sprint/"+projectId.ToString(), "GET");
-            if (!string.IsNullOrEmpty(jsonResult))
-            {
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                try
-                {
-                    var sprints = JsonSerializer.Deserialize<List<Sprint>>(jsonResult, options) ?? new List<Sprint>();
-                    return sprints;
+            var sprints = await FetchSprints("sprint/sprint/project/" + projectId.ToString());
+            if (sprints.Count > 0)
+                return sprints;
 
-                }
-                catch (JsonException ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("Erreur Désérialisation: " + ex.Message);
-                    return new List<Sprint>();
-                }
-            }
-            else
+            // fallback si l'URL principale ne renvoie rien
+            return await FetchSprints("sprint/project/" + projectId.ToString());
+        }
+
+        private async Task<List<Sprint>> FetchSprints(string route)
+        {
+            string jsonResult = await apiService.CallApiAsync(route, "GET");
+            if (string.IsNullOrEmpty(jsonResult))
+                return new List<Sprint>();
+
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            try
             {
+                return JsonSerializer.Deserialize<List<Sprint>>(jsonResult, options) ?? new List<Sprint>();
+            }
+            catch (JsonException ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Erreur Désérialisation des sprints (" + route + "): " + ex.Message);
                 return new List<Sprint>();
             }
         }
 
-        public async Task<bool> CreateSprint(string name, string description)
-        {
-            var payload = new { name = name, description = description };
-            string jsonRequest = JsonSerializer.Serialize(payload);
-            string jsonResult = await apiService.CallApiAsync("project/create", "POST", jsonRequest);
-            return !string.IsNullOrEmpty(jsonResult);
-        }
-
-        public async Task<bool> EditProject(int projectId, string name, string description)
+        public async Task<bool> CreateSprint(int projectId, string sprintGoal, string sprintBeginDate, string sprintEndDate)
         {
             var payload = new
             {
-                name = name,
-                description = description
+                sprint_goal = sprintGoal,
+                sprint_begin_date = sprintBeginDate,
+                sprint_end_date = sprintEndDate,
+                id_project_sprint = projectId
             };
-
-            string json = JsonSerializer.Serialize(payload);
-            string? result = await apiService.CallApiAsync($"project/{projectId}", "PUT", json);
-            return result != null;
+            string jsonRequest = JsonSerializer.Serialize(payload);
+            string jsonResult = await apiService.CallApiAsync("sprint/create/sprint", "POST", jsonRequest);
+            return jsonResult != null;
         }
     }
 }

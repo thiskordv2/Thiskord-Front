@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Thiskord_Front.ViewModels
 {
@@ -25,6 +26,7 @@ namespace Thiskord_Front.ViewModels
 
         public event Action<Project>? ProjectUpdateSuccessful;
         public event Action? ProjectDeleteSuccessful;
+        public event Action? AskConfirmDelete;
         public event Action<Project>? ProjectUpdateCancelled;
 
         [ObservableProperty]
@@ -42,6 +44,7 @@ namespace Thiskord_Front.ViewModels
         [RelayCommand]
         public async Task SaveProject()
         {
+            if (ProjectActuelle == null) return;
             ProjectActuelle.name = ProjectName;
             ProjectActuelle.description = ProjectDescription;
             try
@@ -54,6 +57,9 @@ namespace Thiskord_Front.ViewModels
                 System.Diagnostics.Debug.WriteLine("Error updating project: " + ex.Message);
             }
         }
+
+        [RelayCommand]
+        public async Task ConfirmDelete() { AskConfirmDelete?.Invoke(); }
 
         [RelayCommand]
         public async Task DeleteProject()

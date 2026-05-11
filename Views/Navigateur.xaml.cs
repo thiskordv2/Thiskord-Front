@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Thiskord_Front.Models.GestionProjet;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.ViewModels;
 using Windows.ApplicationModel.Contacts;
@@ -41,7 +42,9 @@ namespace Thiskord_Front.Views
             ViewModel.OnLogoutSuccess += OnLogoutSuccess;
             ViewModel.RequestEditChannel += OnRequestEditChannel;
             ViewModel.OnProjectCreate += CreateProjectTask;
+            ViewModel.OnCreateSprint += ShowCreateSprintDialog;
             ViewModel.OnJoinProject += JoinProjectTask;
+            ViewModel.RequestCreateChannel += OnRequestCreateChannel;
 
             if (e.Parameter is Project project)
             {
@@ -59,13 +62,103 @@ namespace Thiskord_Front.Views
             ViewModel.OnLogoutSuccess -= OnLogoutSuccess;
             ViewModel.RequestEditChannel -= OnRequestEditChannel;
             ViewModel.OnProjectCreate -= CreateProjectTask;
+            ViewModel.OnCreateSprint -= ShowCreateSprintDialog;
             ViewModel.OnInviteTokenReceived -= ShowInviteGenerationDialog;
             ViewModel.OnJoinProject -= JoinProjectTask;
+            ViewModel.RequestCreateChannel -= OnRequestCreateChannel;
         }
 
         private void NavigateToProjectSettings(Project project) { this.Frame.Navigate(typeof(ProjectSettings), project); }
         private void OnLogoutSuccess() { this.Frame.Navigate(typeof(Login)); }
         private void OnRequestEditChannel(Channel channel) { _ = EditChannelAsync(channel); }
+        private void OnRequestCreateChannel() { _ = CreateChannelAsync(); } 
+
+        private async void ShowCreateSprintDialog()
+        {
+            var sprintNameBox = new TextBox
+            {
+                PlaceholderText = "Objectif du sprint",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var beginDatePicker = new DatePicker
+            {
+                Header = "Date de début",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var endDatePicker = new DatePicker
+            {
+                Header = "Date de fin",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var errorMessageBlock = new TextBlock
+            {
+                Visibility = Visibility.Collapsed,
+                Foreground = (Brush)Application.Current.Resources["SystemFillColorAttentionBrush"],
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var content = new StackPanel
+            {
+                Spacing = 12,
+                Children =
+                {
+                    new TextBlock { Text = "Créer un nouveau sprint", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold },
+                    sprintNameBox,
+                    beginDatePicker,
+                    endDatePicker,
+                    errorMessageBlock
+                }
+            };
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Nouveau sprint",
+                Content = content,
+                PrimaryButtonText = "Créer",
+                CloseButtonText = "Annuler",
+                DefaultButton = ContentDialogButton.Primary,
+                MinWidth = 420
+            };
+
+            dialog.PrimaryButtonClick += async (sender, args) =>
+            {
+                errorMessageBlock.Visibility = Visibility.Collapsed;
+
+                if (string.IsNullOrWhiteSpace(sprintNameBox.Text))
+                {
+                    errorMessageBlock.Text = "Le nom du sprint est obligatoire.";
+                    errorMessageBlock.Visibility = Visibility.Visible;
+                    args.Cancel = true;
+                    return;
+                }
+
+                if (beginDatePicker.SelectedDate == null || endDatePicker.SelectedDate == null)
+                {
+                    errorMessageBlock.Text = "Veuillez choisir les dates de début et de fin.";
+                    errorMessageBlock.Visibility = Visibility.Visible;
+                    args.Cancel = true;
+                    return;
+                }
+
+                var beginDate = beginDatePicker.SelectedDate!.Value.ToString("dd-MM-yyyy");
+                var endDate = endDatePicker.SelectedDate!.Value.ToString("dd-MM-yyyy");
+
+                bool success = await ViewModel.ConfirmCreateSprint(sprintNameBox.Text.Trim(), beginDate, endDate);
+                if (!success)
+                {
+                    errorMessageBlock.Text = "Impossible de créer le sprint. Vérifiez les informations et réessayez.";
+                    errorMessageBlock.Visibility = Visibility.Visible;
+                    args.Cancel = true;
+                }
+            };
+
+            await dialog.ShowAsync();
+        }
 
         private async void ShowInviteGenerationDialog()
         {
@@ -297,10 +390,56 @@ namespace Thiskord_Front.Views
         private async void OnOpenProject_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuFlyoutItem { Tag: Project project })
+            {
                 await ViewModel.SelectProjectCommand.ExecuteAsync(project);
-            ViewModel.LoadUsers();
-            ViewModel.SelectedChannel = null;
-            RightPanel.Visibility = Visibility.Visible;
+                await ViewModel.LoadUsers();
+                ViewModel.SelectedChannel = null;
+                RightPanel.Visibility = Visibility.Visible;
+            }
+        }
+
+        private async void SprintMenuFlyout_Opening(object sender, object e)
+        {
+            SprintMenuFlyout.Items.Clear();
+
+            if (ViewModel.Sprints.Count == 0)
+            {
+                SprintMenuFlyout.Items.Add(new MenuFlyoutItem
+                {
+                    Text = "Aucun sprint trouvé",
+                    IsEnabled = false
+                });
+                return;
+            }
+
+            foreach (var sprint in ViewModel.Sprints)
+            {
+                var item = new MenuFlyoutItem
+                {
+                    Text = sprint.sprint_goal,
+                    Tag = sprint
+                };
+                item.Click += OnOpenSprint_Click;
+                SprintMenuFlyout.Items.Add(item);
+            }
+        }
+
+        private async void OnOpenSprint_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem { Tag: Sprint sprint })
+            {
+                await ViewModel.SelectSprintCommand.ExecuteAsync(sprint);
+                if (ViewModel.SelectedProject is not null)
+                {
+                    var parameter = new SprintNavigationParameter
+                    {
+                        Sprint = sprint,
+                        ProjectId = ViewModel.SelectedProject.id
+                    };
+                    InnerFrame.Navigate(typeof(SprintPage), parameter);
+                    RightPanel.Visibility = Visibility.Visible;
+                }
+            }
         }
 
         private void ChannelListing_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -315,14 +454,13 @@ namespace Thiskord_Front.Views
 
         private void SprintListing_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+    
         }
 
         private async Task EditChannelAsync(Channel channel)
         {
             if (channel.Id is null) return;
 
-            // Créer les TextBox pour l'édition
             var nameTextBox = new TextBox
             {
                 Text = channel.Name ?? "",
@@ -339,7 +477,6 @@ namespace Thiskord_Front.Views
                 Margin = new Thickness(0, 0, 0, 10)
             };
 
-            // Créer un StackPanel pour contenir les contrôles
             var contentPanel = new StackPanel
             {
                 Spacing = 10,
@@ -352,7 +489,6 @@ namespace Thiskord_Front.Views
                 }
             };
 
-            // Créer et afficher le ContentDialog
             var dialog = new ContentDialog
             {
                 XamlRoot = this.XamlRoot,
@@ -400,6 +536,79 @@ namespace Thiskord_Front.Views
             }
         }
 
+        // From feature/ChannelCreate
+        private async Task CreateChannelAsync()
+        {
+            var nameTextBox = new TextBox
+            {
+                PlaceholderText = "Nom du channel",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var descriptionTextBox = new TextBox
+            {
+                PlaceholderText = "Description (optionnelle)",
+                AcceptsReturn = true,
+                Height = 100,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var contentPanel = new StackPanel
+            {
+                Spacing = 10,
+                Children =
+                {
+                    new TextBlock { Text = "Nom:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
+                    nameTextBox,
+                    new TextBlock { Text = "Description:", FontWeight = Microsoft.UI.Text.FontWeights.Bold },
+                    descriptionTextBox
+                }
+            };
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Créer un channel",
+                Content = contentPanel,
+                PrimaryButtonText = "Créer",
+                SecondaryButtonText = "Annuler"
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                string newName = nameTextBox.Text.Trim();
+                string newDescription = descriptionTextBox.Text?.Trim() ?? "";
+
+                if (string.IsNullOrWhiteSpace(newName))
+                {
+                    await new ContentDialog
+                    {
+                        XamlRoot = this.XamlRoot,
+                        Title = "Erreur",
+                        Content = "Le nom du channel ne peut pas être vide.",
+                        PrimaryButtonText = "OK"
+                    }.ShowAsync();
+                    return;
+                }
+
+                bool success = await ViewModel.ConfirmCreateChannel(newName, newDescription);
+
+                if (!success)
+                {
+                    await new ContentDialog
+                    {
+                        XamlRoot = this.XamlRoot,
+                        Title = "Erreur",
+                        Content = "Impossible de créer le channel.",
+                        PrimaryButtonText = "OK"
+                    }.ShowAsync();
+                }
+            }
+        }
+
+        // From develop
         private async Task CreateProject()
         {
             var newProjectName = new TextBox
@@ -459,9 +668,7 @@ namespace Thiskord_Front.Views
                     return;
                 }
 
-                bool success = await ViewModel.ConfirmCreateProject(
-                    newName,
-                    newDescription);
+                bool success = await ViewModel.ConfirmCreateProject(newName, newDescription);
 
                 if (!success)
                 {
@@ -476,10 +683,12 @@ namespace Thiskord_Front.Views
             }
         }
 
+        // From develop
         private async void JoinProjectTask()
         {
             await JoinProject();
         }
+
         private async Task JoinProject()
         {
             var title = new TextBlock
