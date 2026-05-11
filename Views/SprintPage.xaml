@@ -45,19 +45,42 @@
 
         <StackPanel Grid.Row="4" Spacing="10">
             <TextBlock Text="Tâches du sprint" FontWeight="SemiBold" FontSize="16" />
+            <!-- Table Headers -->
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="200" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="150" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Titre" FontWeight="Bold" />
+                <TextBlock Grid.Column="1" Text="Description" FontWeight="Bold" />
+                <TextBlock Grid.Column="2" Text="Statut" FontWeight="Bold" />
+                <TextBlock Grid.Column="3" Text="Créateur" FontWeight="Bold" />
+                <TextBlock Grid.Column="4" Text="Responsable" FontWeight="Bold" />
+                <TextBlock Grid.Column="5" Text="Créé le" FontWeight="Bold" />
+            </Grid>
+
+            <!-- Tasks Table -->
             <ListView ItemsSource="{x:Bind ViewModel.Tasks, Mode=OneWay}" SelectionMode="None">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="gestion:SprintTask">
-                        <Border Padding="10" Margin="0,0,0,10" Background="#FF1B1B1B" CornerRadius="8">
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="{x:Bind task_title, Mode=OneWay}" FontWeight="Bold" />
-                                <TextBlock Text="{x:Bind task_desc, Mode=OneWay}" TextWrapping="Wrap" Opacity="0.8" />
-                                <StackPanel Orientation="Horizontal" Spacing="16">
-                                    <TextBlock Text="Statut :" FontWeight="SemiBold" />
-                                    <TextBlock Text="{x:Bind task_status, Mode=OneWay}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
+                        <Grid Margin="0,0,0,5" Background="#FF1B1B1B" Padding="10" CornerRadius="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150" />
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="100" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{x:Bind task_title, Mode=OneWay}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            <TextBlock Grid.Column="1" Text="{x:Bind task_desc, Mode=OneWay}" TextWrapping="Wrap" Opacity="0.8" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind task_status, Mode=OneWay}" />
+                            <TextBlock Grid.Column="3" Text="{x:Bind id_creator, Mode=OneWay}" />
+                            <TextBlock Grid.Column="4" Text="{x:Bind id_resp, Mode=OneWay}" />
+                        </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

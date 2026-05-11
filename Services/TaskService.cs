@@ -51,8 +51,20 @@ namespace Thiskord_Front.Services
             if (task == null)
                 return false;
 
-            string jsonRequest = JsonSerializer.Serialize(task);
-            string jsonResult = await _apiService.CallApiAsync("api/task/task", "POST", jsonRequest);
+            var payload = new
+            {
+                task_title = task.task_title,
+                task_desc = task.task_desc,
+                is_subtask = task.is_subtask,
+                task_status = task.task_status,
+                id_creator = task.id_creator,
+                id_resp = task.id_resp,
+                id_project_task = task.id_project_task,
+                id_sprint = task.id_sprint
+            };
+
+            string jsonRequest = JsonSerializer.Serialize(payload);
+            string jsonResult = await _apiService.CallApiAsync("sprinttask/task", "POST", jsonRequest);
             return !string.IsNullOrEmpty(jsonResult);
         }
 

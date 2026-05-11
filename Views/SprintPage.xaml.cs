@@ -49,6 +49,14 @@ namespace Thiskord_Front.Views
                 Margin = new Thickness(0, 0, 0, 10)
             };
 
+            var statusComboBox = new ComboBox
+            {
+                PlaceholderText = "Sélectionner le statut",
+                Margin = new Thickness(0, 0, 0, 10),
+                ItemsSource = new string[] { "TODO", "IN_PROGRESS", "DONE" },
+                SelectedIndex = 1 // Default to IN_PROGRESS
+            };
+
             var errorText = new TextBlock
             {
                 Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SystemFillColorAttentionBrush"],
@@ -65,6 +73,7 @@ namespace Thiskord_Front.Views
                     new TextBlock { Text = "Créer une nouvelle tâche", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold },
                     titleBox,
                     descriptionBox,
+                    statusComboBox,
                     errorText
                 }
             };
@@ -91,7 +100,8 @@ namespace Thiskord_Front.Views
                     return;
                 }
 
-                bool success = await ViewModel.ConfirmCreateTaskAsync(titleBox.Text.Trim(), descriptionBox.Text?.Trim());
+                string selectedStatus = statusComboBox.SelectedItem as string ?? "IN_PROGRESS";
+                bool success = await ViewModel.ConfirmCreateTaskAsync(titleBox.Text.Trim(), descriptionBox.Text.Trim() ?? "", selectedStatus);
                 if (!success)
                 {
                     errorText.Text = "Impossible de créer la tâche. Vérifiez les informations et réessayez.";

@@ -50,17 +50,16 @@ namespace Thiskord_Front.ViewModels
             IsLoadingTasks = false;
         }
 
-        public async Task<bool> ConfirmCreateTaskAsync(string title, string description)
+        public async Task<bool> ConfirmCreateTaskAsync(string title, string description, string status = "IN_PROGRESS")
         {
-            if (Sprint is null || string.IsNullOrWhiteSpace(title))
-                return false;
+            
 
             var task = new SprintTask
             {
                 task_title = title,
                 task_desc = description ?? string.Empty,
                 is_subtask = false,
-                task_status = "IN_PROGRESS",
+                task_status = status,
                 id_creator = _sessionService.CurrentUserId ?? 0,
                 id_resp = _sessionService.CurrentUserId ?? 0,
                 id_project_task = _projectId,
