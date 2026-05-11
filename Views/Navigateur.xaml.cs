@@ -42,6 +42,7 @@ namespace Thiskord_Front.Views
             ViewModel.RequestEditChannel += OnRequestEditChannel;
             ViewModel.OnProjectCreate += CreateProjectTask;
             ViewModel.OnJoinProject += JoinProjectTask;
+            ViewModel.RequestCreateChannel += OnRequestCreateChannel;
 
             if (e.Parameter is Project project)
             {
@@ -61,12 +62,13 @@ namespace Thiskord_Front.Views
             ViewModel.OnProjectCreate -= CreateProjectTask;
             ViewModel.OnInviteTokenReceived -= ShowInviteGenerationDialog;
             ViewModel.OnJoinProject -= JoinProjectTask;
-            ViewModel.RequestCreateChannel += () => _ = CreateChannelAsync();
+            ViewModel.RequestCreateChannel -= OnRequestCreateChannel;
         }
 
         private void NavigateToProjectSettings(Project project) { this.Frame.Navigate(typeof(ProjectSettings), project); }
         private void OnLogoutSuccess() { this.Frame.Navigate(typeof(Login)); }
         private void OnRequestEditChannel(Channel channel) { _ = EditChannelAsync(channel); }
+        private void OnRequestCreateChannel() { _ = CreateChannelAsync(); } 
 
         private async void ShowInviteGenerationDialog()
         {
