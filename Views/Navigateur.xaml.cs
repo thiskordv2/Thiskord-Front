@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Thiskord_Front.Models.GestionProjet;
 using Thiskord_Front.Models.Project;
 using Thiskord_Front.ViewModels;
 using Windows.ApplicationModel.Contacts;
@@ -41,6 +42,7 @@ namespace Thiskord_Front.Views
             ViewModel.OnLogoutSuccess += OnLogoutSuccess;
             ViewModel.RequestEditChannel += OnRequestEditChannel;
             ViewModel.OnProjectCreate += CreateProjectTask;
+            ViewModel.OnCreateSprint += ShowCreateSprintDialog;
             ViewModel.OnJoinProject += JoinProjectTask;
 
             if (e.Parameter is Project project)
@@ -59,6 +61,7 @@ namespace Thiskord_Front.Views
             ViewModel.OnLogoutSuccess -= OnLogoutSuccess;
             ViewModel.RequestEditChannel -= OnRequestEditChannel;
             ViewModel.OnProjectCreate -= CreateProjectTask;
+            ViewModel.OnCreateSprint -= ShowCreateSprintDialog;
             ViewModel.OnInviteTokenReceived -= ShowInviteGenerationDialog;
             ViewModel.OnJoinProject -= JoinProjectTask;
             ViewModel.RequestCreateChannel += () => _ = CreateChannelAsync();
@@ -67,6 +70,93 @@ namespace Thiskord_Front.Views
         private void NavigateToProjectSettings(Project project) { this.Frame.Navigate(typeof(ProjectSettings), project); }
         private void OnLogoutSuccess() { this.Frame.Navigate(typeof(Login)); }
         private void OnRequestEditChannel(Channel channel) { _ = EditChannelAsync(channel); }
+
+        private async void ShowCreateSprintDialog()
+        {
+            var sprintNameBox = new TextBox
+            {
+                PlaceholderText = "Objectif du sprint",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var beginDatePicker = new DatePicker
+            {
+                Header = "Date de début",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var endDatePicker = new DatePicker
+            {
+                Header = "Date de fin",
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var errorMessageBlock = new TextBlock
+            {
+                Visibility = Visibility.Collapsed,
+                Foreground = (Brush)Application.Current.Resources["SystemFillColorAttentionBrush"],
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+
+            var content = new StackPanel
+            {
+                Spacing = 12,
+                Children =
+                {
+                    new TextBlock { Text = "Créer un nouveau sprint", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold },
+                    sprintNameBox,
+                    beginDatePicker,
+                    endDatePicker,
+                    errorMessageBlock
+                }
+            };
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.XamlRoot,
+                Title = "Nouveau sprint",
+                Content = content,
+                PrimaryButtonText = "Créer",
+                CloseButtonText = "Annuler",
+                DefaultButton = ContentDialogButton.Primary,
+                MinWidth = 420
+            };
+
+            dialog.PrimaryButtonClick += async (sender, args) =>
+            {
+                errorMessageBlock.Visibility = Visibility.Collapsed;
+
+                if (string.IsNullOrWhiteSpace(sprintNameBox.Text))
+                {
+                    errorMessageBlock.Text = "Le nom du sprint est obligatoire.";
+                    errorMessageBlock.Visibility = Visibility.Visible;
+                    args.Cancel = true;
+                    return;
+                }
+
+                if (beginDatePicker.SelectedDate == null || endDatePicker.SelectedDate == null)
+                {
+                    errorMessageBlock.Text = "Veuillez choisir les dates de début et de fin.";
+                    errorMessageBlock.Visibility = Visibility.Visible;
+                    args.Cancel = true;
+                    return;
+                }
+
+                var beginDate = beginDatePicker.SelectedDate!.Value.ToString("dd-MM-yyyy");
+                var endDate = endDatePicker.SelectedDate!.Value.ToString("dd-MM-yyyy");
+
+                bool success = await ViewModel.ConfirmCreateSprint(sprintNameBox.Text.Trim(), beginDate, endDate);
+                if (!success)
+                {
+                    errorMessageBlock.Text = "Impossible de créer le sprint. Vérifiez les informations et réessayez.";
+                    errorMessageBlock.Visibility = Visibility.Visible;
+                    args.Cancel = true;
+                }
+            };
+
+            await dialog.ShowAsync();
+        }
 
         private async void ShowInviteGenerationDialog()
         {
@@ -298,10 +388,56 @@ namespace Thiskord_Front.Views
         private async void OnOpenProject_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuFlyoutItem { Tag: Project project })
+            {
                 await ViewModel.SelectProjectCommand.ExecuteAsync(project);
-            ViewModel.LoadUsers();
-            ViewModel.SelectedChannel = null;
-            RightPanel.Visibility = Visibility.Visible;
+                await ViewModel.LoadUsers();
+                ViewModel.SelectedChannel = null;
+                RightPanel.Visibility = Visibility.Visible;
+            }
+        }
+
+        private async void SprintMenuFlyout_Opening(object sender, object e)
+        {
+            SprintMenuFlyout.Items.Clear();
+
+            if (ViewModel.Sprints.Count == 0)
+            {
+                SprintMenuFlyout.Items.Add(new MenuFlyoutItem
+                {
+                    Text = "Aucun sprint trouvé",
+                    IsEnabled = false
+                });
+                return;
+            }
+
+            foreach (var sprint in ViewModel.Sprints)
+            {
+                var item = new MenuFlyoutItem
+                {
+                    Text = sprint.sprint_goal,
+                    Tag = sprint
+                };
+                item.Click += OnOpenSprint_Click;
+                SprintMenuFlyout.Items.Add(item);
+            }
+        }
+
+        private async void OnOpenSprint_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem { Tag: Sprint sprint })
+            {
+                await ViewModel.SelectSprintCommand.ExecuteAsync(sprint);
+                if (ViewModel.SelectedProject is not null)
+                {
+                    var parameter = new SprintNavigationParameter
+                    {
+                        Sprint = sprint,
+                        ProjectId = ViewModel.SelectedProject.id
+                    };
+                    InnerFrame.Navigate(typeof(SprintPage), parameter);
+                    RightPanel.Visibility = Visibility.Visible;
+                }
+            }
         }
 
         private void ChannelListing_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -316,7 +452,7 @@ namespace Thiskord_Front.Views
 
         private void SprintListing_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+    
         }
 
         private async Task EditChannelAsync(Channel channel)

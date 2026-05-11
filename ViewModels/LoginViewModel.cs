@@ -58,7 +58,7 @@ namespace Thiskord_Front.ViewModels
                 
                 AuthenticatedUser response = await _authService.login(jsonRequest);
 
-                _sessionService.Login(response.user.userName, response.token);
+                _sessionService.Login(response.user.userName, response.token, response.user.userId);
                 OnLoginSuccess?.Invoke();
             }
             catch (Exception ex)
