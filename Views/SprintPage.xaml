@@ -9,7 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Padding="16" RowSpacing="16">
+    <Grid Padding="16,60,16,16" RowSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -43,15 +43,15 @@
         <StackPanel Grid.Row="4" Spacing="10">
             <TextBlock Text="Tâches du sprint" FontWeight="SemiBold" FontSize="16" />
             <!-- Table Headers -->
-            <Grid Margin="0,0,0,10">
+            <Grid Margin="0,0,0,10" Padding="10,0,10,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="120" />
                     <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="80" />
-                    <ColumnDefinition Width="80" />
-                    <ColumnDefinition Width="80" />
                     <ColumnDefinition Width="120" />
-                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="100" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Titre" FontWeight="Bold" />
                 <TextBlock Grid.Column="1" Text="Description" FontWeight="Bold" />
@@ -65,30 +65,41 @@
             <!-- Tasks Table -->
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <ListView x:Name="TasksListView" ItemsSource="{x:Bind ViewModel.Tasks, Mode=OneWay}" SelectionMode="None">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="0,0,0,5" Background="#FF1B1B1B" Padding="10" CornerRadius="4">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="120" />
-                                <ColumnDefinition Width="150" />
-                                <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="120" />
-                                <ColumnDefinition Width="80" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding task_title}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                            <TextBlock Grid.Column="1" Text="{Binding task_desc}" TextWrapping="Wrap" Opacity="0.8" />
-                            <TextBlock Grid.Column="2" Text="{Binding task_status}" />
-                            <TextBlock Grid.Column="3" Text="{Binding id_creator}" />
-                            <TextBlock Grid.Column="4" Text="{Binding id_resp}" />
-                            <TextBlock Grid.Column="5" Text="{Binding created_at}" />
-                            <Button Grid.Column="6" Content="Supprimer" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                    Command="{Binding ElementName=TasksListView, Path=DataContext.DeleteTaskCommand}" CommandParameter="{Binding}" />
-                        </Grid>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0,0,0,0" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,5" Background="#FF1B1B1B" Padding="10" CornerRadius="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="150" />
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="100" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Text="{Binding task_title}" FontWeight="SemiBold" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding task_desc}" TextWrapping="Wrap" Opacity="0.8" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="2" Text="{Binding task_status}" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="3" Text="{Binding id_creator}" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="4" Text="{Binding id_resp}" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="5" Text="{Binding created_at}" VerticalAlignment="Center" />
+
+                                <Button Grid.Column="6" Content="Supprimer" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                        Command="{Binding ElementName=TasksListView, Path=DataContext.DeleteTaskCommand}" CommandParameter="{Binding}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </ScrollViewer>
         </StackPanel>
     </Grid>
